@@ -108,14 +108,16 @@ function DashboardPage() {
     <div className="flex min-h-screen bg-[var(--color-brand-surface)] text-slate-900">
       {/* Sidebar */}
       <aside className="hidden lg:flex w-72 shrink-0 bg-[var(--color-brand-primary)] text-white flex-col sticky top-0 h-screen">
-        <div className="p-8 pb-4">
-          <div className="mb-8">
-            <img
-              src={logoAsset.url}
-              alt="Aponti"
-              className="h-8 w-auto"
-            />
-            <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-2">
+        <div className="p-6 lg:p-8 pb-4">
+          <div className="mb-8 lg:mb-10">
+            <div className="flex items-center">
+              <img
+                src={logoAsset.url}
+                alt="Aponti"
+                className="h-9 lg:h-11 w-auto max-w-full"
+              />
+            </div>
+            <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-3">
               Diário de Aula
             </p>
           </div>

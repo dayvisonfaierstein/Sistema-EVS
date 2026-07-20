@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import logoAsset from "../assets/aponti-logo.png.asset.json";
 import {
   Bell,
   Calendar as CalendarIcon,
@@ -108,16 +109,15 @@ function DashboardPage() {
       {/* Sidebar */}
       <aside className="hidden lg:flex w-72 shrink-0 bg-[var(--color-brand-primary)] text-white flex-col sticky top-0 h-screen">
         <div className="p-8 pb-4">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="size-10 bg-[var(--color-brand-accent)] rounded-xl flex items-center justify-center font-extrabold text-xl shadow-lg shadow-[var(--color-brand-accent)]/20">
-              A
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight leading-none">Aponti</h1>
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-1">
-                Diário de Aula
-              </p>
-            </div>
+          <div className="mb-8">
+            <img
+              src={logoAsset.url}
+              alt="Aponti"
+              className="h-8 w-auto"
+            />
+            <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-2">
+              Diário de Aula
+            </p>
           </div>
 
           <div className="rounded-xl bg-white/[0.04] border border-white/5 p-4 mb-8">

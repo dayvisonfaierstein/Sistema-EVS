@@ -9,38 +9,321 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppVendasRouteImport } from './routes/_app/vendas'
+import { Route as AppUsuariosRouteImport } from './routes/_app/usuarios'
+import { Route as AppRelatoriosRouteImport } from './routes/_app/relatorios'
+import { Route as AppProdutosRouteImport } from './routes/_app/produtos'
+import { Route as AppFornecedoresRouteImport } from './routes/_app/fornecedores'
+import { Route as AppFinanceiroRouteImport } from './routes/_app/financeiro'
+import { Route as AppEventosRouteImport } from './routes/_app/eventos'
+import { Route as AppEstoqueRouteImport } from './routes/_app/estoque'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppConfiguracoesRouteImport } from './routes/_app/configuracoes'
+import { Route as AppCampanhasRouteImport } from './routes/_app/campanhas'
+import { Route as AppAvaliacoesRouteImport } from './routes/_app/avaliacoes'
+import { Route as AppAgendaRouteImport } from './routes/_app/agenda'
+import { Route as AppAcessosRouteImport } from './routes/_app/acessos'
+import { Route as AppClientesIndexRouteImport } from './routes/_app/clientes.index'
+import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo'
+import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
 
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppVendasRoute = AppVendasRouteImport.update({
+  id: '/vendas',
+  path: '/vendas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsuariosRoute = AppUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProdutosRoute = AppProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFornecedoresRoute = AppFornecedoresRouteImport.update({
+  id: '/fornecedores',
+  path: '/fornecedores',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEventosRoute = AppEventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEstoqueRoute = AppEstoqueRouteImport.update({
+  id: '/estoque',
+  path: '/estoque',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCampanhasRoute = AppCampanhasRouteImport.update({
+  id: '/campanhas',
+  path: '/campanhas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAvaliacoesRoute = AppAvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAgendaRoute = AppAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAcessosRoute = AppAcessosRouteImport.update({
+  id: '/acessos',
+  path: '/acessos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientesIndexRoute = AppClientesIndexRouteImport.update({
+  id: '/clientes/',
+  path: '/clientes/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientesNovoRoute = AppClientesNovoRouteImport.update({
+  id: '/clientes/novo',
+  path: '/clientes/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientesIdRoute = AppClientesIdRouteImport.update({
+  id: '/clientes/$id',
+  path: '/clientes/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRoute
+  '/acessos': typeof AppAcessosRoute
+  '/agenda': typeof AppAgendaRoute
+  '/avaliacoes': typeof AppAvaliacoesRoute
+  '/campanhas': typeof AppCampanhasRoute
+  '/configuracoes': typeof AppConfiguracoesRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/estoque': typeof AppEstoqueRoute
+  '/eventos': typeof AppEventosRoute
+  '/financeiro': typeof AppFinanceiroRoute
+  '/fornecedores': typeof AppFornecedoresRoute
+  '/produtos': typeof AppProdutosRoute
+  '/relatorios': typeof AppRelatoriosRoute
+  '/usuarios': typeof AppUsuariosRoute
+  '/vendas': typeof AppVendasRoute
+  '/clientes/$id': typeof AppClientesIdRoute
+  '/clientes/novo': typeof AppClientesNovoRoute
+  '/clientes/': typeof AppClientesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRoute
+  '/acessos': typeof AppAcessosRoute
+  '/agenda': typeof AppAgendaRoute
+  '/avaliacoes': typeof AppAvaliacoesRoute
+  '/campanhas': typeof AppCampanhasRoute
+  '/configuracoes': typeof AppConfiguracoesRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/estoque': typeof AppEstoqueRoute
+  '/eventos': typeof AppEventosRoute
+  '/financeiro': typeof AppFinanceiroRoute
+  '/fornecedores': typeof AppFornecedoresRoute
+  '/produtos': typeof AppProdutosRoute
+  '/relatorios': typeof AppRelatoriosRoute
+  '/usuarios': typeof AppUsuariosRoute
+  '/vendas': typeof AppVendasRoute
+  '/clientes/$id': typeof AppClientesIdRoute
+  '/clientes/novo': typeof AppClientesNovoRoute
+  '/clientes': typeof AppClientesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/portal': typeof PortalRoute
+  '/_app/acessos': typeof AppAcessosRoute
+  '/_app/agenda': typeof AppAgendaRoute
+  '/_app/avaliacoes': typeof AppAvaliacoesRoute
+  '/_app/campanhas': typeof AppCampanhasRoute
+  '/_app/configuracoes': typeof AppConfiguracoesRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/estoque': typeof AppEstoqueRoute
+  '/_app/eventos': typeof AppEventosRoute
+  '/_app/financeiro': typeof AppFinanceiroRoute
+  '/_app/fornecedores': typeof AppFornecedoresRoute
+  '/_app/produtos': typeof AppProdutosRoute
+  '/_app/relatorios': typeof AppRelatoriosRoute
+  '/_app/usuarios': typeof AppUsuariosRoute
+  '/_app/vendas': typeof AppVendasRoute
+  '/_app/clientes/$id': typeof AppClientesIdRoute
+  '/_app/clientes/novo': typeof AppClientesNovoRoute
+  '/_app/clientes/': typeof AppClientesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/portal'
+    | '/acessos'
+    | '/agenda'
+    | '/avaliacoes'
+    | '/campanhas'
+    | '/configuracoes'
+    | '/dashboard'
+    | '/estoque'
+    | '/eventos'
+    | '/financeiro'
+    | '/fornecedores'
+    | '/produtos'
+    | '/relatorios'
+    | '/usuarios'
+    | '/vendas'
+    | '/clientes/$id'
+    | '/clientes/novo'
+    | '/clientes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/portal'
+    | '/acessos'
+    | '/agenda'
+    | '/avaliacoes'
+    | '/campanhas'
+    | '/configuracoes'
+    | '/dashboard'
+    | '/estoque'
+    | '/eventos'
+    | '/financeiro'
+    | '/fornecedores'
+    | '/produtos'
+    | '/relatorios'
+    | '/usuarios'
+    | '/vendas'
+    | '/clientes/$id'
+    | '/clientes/novo'
+    | '/clientes'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/onboarding'
+    | '/portal'
+    | '/_app/acessos'
+    | '/_app/agenda'
+    | '/_app/avaliacoes'
+    | '/_app/campanhas'
+    | '/_app/configuracoes'
+    | '/_app/dashboard'
+    | '/_app/estoque'
+    | '/_app/eventos'
+    | '/_app/financeiro'
+    | '/_app/fornecedores'
+    | '/_app/produtos'
+    | '/_app/relatorios'
+    | '/_app/usuarios'
+    | '/_app/vendas'
+    | '/_app/clientes/$id'
+    | '/_app/clientes/novo'
+    | '/_app/clientes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  PortalRoute: typeof PortalRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +331,187 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/vendas': {
+      id: '/_app/vendas'
+      path: '/vendas'
+      fullPath: '/vendas'
+      preLoaderRoute: typeof AppVendasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/usuarios': {
+      id: '/_app/usuarios'
+      path: '/usuarios'
+      fullPath: '/usuarios'
+      preLoaderRoute: typeof AppUsuariosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/relatorios': {
+      id: '/_app/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof AppRelatoriosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/produtos': {
+      id: '/_app/produtos'
+      path: '/produtos'
+      fullPath: '/produtos'
+      preLoaderRoute: typeof AppProdutosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/fornecedores': {
+      id: '/_app/fornecedores'
+      path: '/fornecedores'
+      fullPath: '/fornecedores'
+      preLoaderRoute: typeof AppFornecedoresRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/financeiro': {
+      id: '/_app/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof AppFinanceiroRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/eventos': {
+      id: '/_app/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof AppEventosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/estoque': {
+      id: '/_app/estoque'
+      path: '/estoque'
+      fullPath: '/estoque'
+      preLoaderRoute: typeof AppEstoqueRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/configuracoes': {
+      id: '/_app/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AppConfiguracoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/campanhas': {
+      id: '/_app/campanhas'
+      path: '/campanhas'
+      fullPath: '/campanhas'
+      preLoaderRoute: typeof AppCampanhasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/avaliacoes': {
+      id: '/_app/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/avaliacoes'
+      preLoaderRoute: typeof AppAvaliacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/agenda': {
+      id: '/_app/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AppAgendaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/acessos': {
+      id: '/_app/acessos'
+      path: '/acessos'
+      fullPath: '/acessos'
+      preLoaderRoute: typeof AppAcessosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clientes/': {
+      id: '/_app/clientes/'
+      path: '/clientes'
+      fullPath: '/clientes/'
+      preLoaderRoute: typeof AppClientesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clientes/novo': {
+      id: '/_app/clientes/novo'
+      path: '/clientes/novo'
+      fullPath: '/clientes/novo'
+      preLoaderRoute: typeof AppClientesNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/clientes/$id': {
+      id: '/_app/clientes/$id'
+      path: '/clientes/$id'
+      fullPath: '/clientes/$id'
+      preLoaderRoute: typeof AppClientesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAcessosRoute: typeof AppAcessosRoute
+  AppAgendaRoute: typeof AppAgendaRoute
+  AppAvaliacoesRoute: typeof AppAvaliacoesRoute
+  AppCampanhasRoute: typeof AppCampanhasRoute
+  AppConfiguracoesRoute: typeof AppConfiguracoesRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppEstoqueRoute: typeof AppEstoqueRoute
+  AppEventosRoute: typeof AppEventosRoute
+  AppFinanceiroRoute: typeof AppFinanceiroRoute
+  AppFornecedoresRoute: typeof AppFornecedoresRoute
+  AppProdutosRoute: typeof AppProdutosRoute
+  AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppUsuariosRoute: typeof AppUsuariosRoute
+  AppVendasRoute: typeof AppVendasRoute
+  AppClientesIdRoute: typeof AppClientesIdRoute
+  AppClientesNovoRoute: typeof AppClientesNovoRoute
+  AppClientesIndexRoute: typeof AppClientesIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAcessosRoute: AppAcessosRoute,
+  AppAgendaRoute: AppAgendaRoute,
+  AppAvaliacoesRoute: AppAvaliacoesRoute,
+  AppCampanhasRoute: AppCampanhasRoute,
+  AppConfiguracoesRoute: AppConfiguracoesRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppEstoqueRoute: AppEstoqueRoute,
+  AppEventosRoute: AppEventosRoute,
+  AppFinanceiroRoute: AppFinanceiroRoute,
+  AppFornecedoresRoute: AppFornecedoresRoute,
+  AppProdutosRoute: AppProdutosRoute,
+  AppRelatoriosRoute: AppRelatoriosRoute,
+  AppUsuariosRoute: AppUsuariosRoute,
+  AppVendasRoute: AppVendasRoute,
+  AppClientesIdRoute: AppClientesIdRoute,
+  AppClientesNovoRoute: AppClientesNovoRoute,
+  AppClientesIndexRoute: AppClientesIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
+  PortalRoute: PortalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

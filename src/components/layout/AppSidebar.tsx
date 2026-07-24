@@ -1,0 +1,111 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  LayoutDashboard,
+  Users,
+  UserPlus,
+  ClipboardList,
+  LogIn,
+  Calendar,
+  ShoppingCart,
+  Package,
+  Wallet,
+  Box,
+  Truck,
+  PartyPopper,
+  Megaphone,
+  FileBarChart,
+  Shield,
+  Settings,
+  Leaf,
+} from "lucide-react";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+
+const principal = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Clientes", url: "/clientes", icon: Users },
+  { title: "Novo cadastro", url: "/clientes/novo", icon: UserPlus },
+  { title: "Avaliações", url: "/avaliacoes", icon: ClipboardList },
+  { title: "Acessos", url: "/acessos", icon: LogIn },
+  { title: "Agenda", url: "/agenda", icon: Calendar },
+];
+const comercial = [
+  { title: "Vendas (PDV)", url: "/vendas", icon: ShoppingCart },
+  { title: "Produtos", url: "/produtos", icon: Package },
+  { title: "Estoque", url: "/estoque", icon: Box },
+  { title: "Financeiro", url: "/financeiro", icon: Wallet },
+  { title: "Fornecedores", url: "/fornecedores", icon: Truck },
+];
+const engajamento = [
+  { title: "Eventos", url: "/eventos", icon: PartyPopper },
+  { title: "Campanhas", url: "/campanhas", icon: Megaphone },
+  { title: "Relatórios", url: "/relatorios", icon: FileBarChart },
+];
+const sistema = [
+  { title: "Usuários", url: "/usuarios", icon: Shield },
+  { title: "Configurações", url: "/configuracoes", icon: Settings },
+];
+
+function Group({ label, items }: { label: string; items: typeof principal }) {
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => {
+            const active = path === item.url || (item.url !== "/" && path.startsWith(item.url));
+            return (
+              <SidebarMenuItem key={item.url}>
+                <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
+                  <Link to={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+}
+
+export function AppSidebar() {
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-2 py-2">
+          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <Leaf className="size-5" />
+          </div>
+          {!collapsed && (
+            <div className="min-w-0">
+              <div className="truncate text-sm font-bold leading-tight">Espaço+</div>
+              <div className="truncate text-[11px] text-muted-foreground">Vida Saudável</div>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <Group label="Principal" items={principal} />
+        <Group label="Comercial" items={comercial} />
+        <Group label="Engajamento" items={engajamento} />
+        <Group label="Sistema" items={sistema} />
+      </SidebarContent>
+    </Sidebar>
+  );
+}

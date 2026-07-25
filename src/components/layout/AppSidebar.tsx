@@ -24,12 +24,14 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { APP_VERSION_LABEL } from "@/lib/version";
 
 const principal = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -106,6 +108,14 @@ export function AppSidebar() {
         <Group label="Engajamento" items={engajamento} />
         <Group label="Sistema" items={sistema} />
       </SidebarContent>
+      <SidebarFooter>
+        <div
+          className="px-3 py-2 text-center text-[10px] text-muted-foreground"
+          title={`Espaço+ ${APP_VERSION_LABEL}`}
+        >
+          {collapsed ? APP_VERSION_LABEL : `Espaço+ • ${APP_VERSION_LABEL}`}
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

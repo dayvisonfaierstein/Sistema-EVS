@@ -8,6 +8,21 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.0] - 2026-07-25
+
+### Adicionado
+
+- Nova interface responsiva de login do Espaço+;
+- Fotografia institucional local na área central;
+- Exibição da versão no login e no menu do sistema;
+- Suporte ao apelido de acesso `admin`, vinculado por variável de ambiente.
+
+### Mantido
+
+- Autenticação, sessão e recuperação de senha existentes no Supabase;
+- Redirecionamento por perfil e proteção das rotas;
+- Regras de acesso, banco de dados e dashboard sem alterações.
+
 ## [0.1.0] - 2026-07-24
 
 ### Adicionado

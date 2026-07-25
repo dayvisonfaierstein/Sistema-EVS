@@ -8,6 +8,12 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.5] - 2026-07-25
+
+### Alterado
+
+- Substituição do favicon padrão do Lovable pelo ícone oficial fornecido pelo site MyHerbalife.
+
 ## [0.2.4] - 2026-07-25
 
 ### Alterado

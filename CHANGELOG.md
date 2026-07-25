@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.1] - 2026-07-25
+
+### Alterado
+
+- Redução proporcional da tela de login para uma apresentação mais compacta;
+- Manutenção dos ícones, fotografia, recursos e comportamento da versão anterior.
+
 ## [0.2.0] - 2026-07-25
 
 ### Adicionado

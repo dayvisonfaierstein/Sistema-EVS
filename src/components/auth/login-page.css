@@ -15,10 +15,13 @@
 }
 
 .evs-login-shell {
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 20px;
+  overflow: hidden;
+  padding: 16px;
   color: var(--evs-text);
   background:
     radial-gradient(circle at 9% 9%, rgb(184 217 47 / 13%), transparent 24rem),
@@ -27,7 +30,8 @@
 
 .evs-login-card {
   width: min(1360px, 100%);
-  min-height: min(810px, calc(100vh - 40px));
+  height: min(810px, calc(100dvh - 32px));
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(320px, 1.02fr) minmax(280px, 0.8fr) minmax(380px, 1.18fr);
   overflow: hidden;
@@ -40,23 +44,20 @@
 .evs-brand-panel {
   position: relative;
   overflow: hidden;
-  padding: clamp(34px, 3.4vw, 58px) clamp(30px, 2.8vw, 48px);
+  padding: clamp(28px, 2.3vw, 38px) clamp(30px, 2.8vw, 48px);
 }
 
 .evs-brand-panel::after {
   content: "";
   position: absolute;
   z-index: 1;
-  right: -18px;
-  bottom: -16px;
-  width: 300px;
-  height: 150px;
-  opacity: 0.55;
-  background:
-    radial-gradient(ellipse at 50% 100%, rgb(226 234 216 / 85%) 0 48%, transparent 50%) 0 0 / 76px
-      70px,
-    radial-gradient(ellipse at 100% 50%, rgb(226 234 216 / 72%) 0 48%, transparent 50%) 38px 35px /
-      76px 70px;
+  right: 0;
+  bottom: 0;
+  width: 58%;
+  height: 76px;
+  opacity: 0.5;
+  background: radial-gradient(ellipse at 50% 100%, rgb(226 234 216 / 90%) 0 47%, transparent 49%) 0
+    0 / 74px 72px repeat-x;
 }
 
 .evs-brand-copy {
@@ -68,58 +69,20 @@
 }
 
 .evs-logo {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  color: var(--evs-green-dark);
-}
-
-.evs-logo-mark {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  border: 3px solid var(--evs-green);
-  border-radius: 50%;
-}
-
-.evs-logo-mark span {
-  position: absolute;
-  width: 20px;
-  height: 31px;
-  left: 12px;
-  top: 6px;
-  border-radius: 100% 0;
-  background: var(--evs-lime);
-  transform: rotate(30deg);
-}
-
-.evs-logo-copy strong,
-.evs-logo-copy small {
   display: block;
-}
-
-.evs-logo-copy strong {
-  font-size: clamp(19px, 1.45vw, 24px);
-  line-height: 1;
-  letter-spacing: -0.04em;
-}
-
-.evs-logo-copy small {
-  margin-top: 6px;
-  color: var(--evs-muted);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  width: min(220px, 72%);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .evs-headline {
-  margin-top: clamp(44px, 6.5vh, 82px);
+  margin-top: clamp(24px, 3vh, 34px);
 }
 
 .evs-headline h1 {
   margin: 0;
-  font-size: clamp(35px, 2.2vw, 43px);
+  font-size: clamp(34px, 2vw, 40px);
   line-height: 1.07;
   letter-spacing: -0.045em;
   font-weight: 750;
@@ -140,8 +103,8 @@
 .evs-feature-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px 18px;
-  margin-top: 34px;
+  gap: 14px 18px;
+  margin-top: 18px;
 }
 
 .evs-feature {
@@ -195,7 +158,7 @@
   gap: 13px;
   align-items: center;
   margin-top: auto;
-  margin-bottom: 92px;
+  margin-bottom: 28px;
   padding: 15px 18px;
   border: 1px solid rgb(211 222 214 / 85%);
   border-radius: 20px;
@@ -217,11 +180,11 @@
 .evs-arc-left {
   z-index: 2;
   position: absolute;
-  left: -80px;
-  bottom: -160px;
-  width: 380px;
-  height: 380px;
-  border: 34px solid var(--evs-lime);
+  left: -94px;
+  bottom: -330px;
+  width: 410px;
+  height: 410px;
+  border: 32px solid var(--evs-lime);
   border-right-color: transparent;
   border-bottom-color: transparent;
   border-radius: 50%;
@@ -238,7 +201,7 @@
 .evs-hero-image {
   width: 100%;
   height: 100%;
-  min-height: 720px;
+  min-height: 0;
   display: block;
   object-fit: cover;
   object-position: center;
@@ -512,7 +475,7 @@
 
 @media (max-width: 1020px) {
   .evs-login-card {
-    min-height: calc(100vh - 28px);
+    height: calc(100dvh - 28px);
     grid-template-columns: minmax(300px, 0.82fr) minmax(430px, 1.18fr);
     border-radius: 30px;
   }
@@ -524,13 +487,17 @@
 
 @media (max-width: 760px) {
   .evs-login-shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
     padding: 0;
     background: #fff;
   }
 
   .evs-login-card {
     width: 100%;
-    min-height: 100vh;
+    height: auto;
+    min-height: 100dvh;
     display: block;
     border: 0;
     border-radius: 0;
@@ -600,7 +567,7 @@
   }
 
   .evs-login-card {
-    min-height: calc(100vh - 24px);
+    height: calc(100dvh - 24px);
   }
 
   .evs-brand-panel {
@@ -608,50 +575,43 @@
     padding-bottom: 26px;
   }
 
-  .evs-logo-mark {
-    width: 46px;
-    height: 46px;
-  }
-
-  .evs-logo-mark span {
-    left: 11px;
-    top: 6px;
-    width: 20px;
-    height: 30px;
+  .evs-logo {
+    width: min(220px, 72%);
   }
 
   .evs-headline {
-    margin-top: 34px;
-  }
-
-  .evs-headline h1 {
-    font-size: 38px;
-  }
-
-  .evs-headline p {
-    margin-top: 16px;
-    font-size: 15px;
-  }
-
-  .evs-feature-grid {
-    gap: 16px 18px;
     margin-top: 24px;
   }
 
+  .evs-headline h1 {
+    font-size: 34px;
+  }
+
+  .evs-headline p {
+    margin-top: 11px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .evs-feature-grid {
+    gap: 11px 16px;
+    margin-top: 17px;
+  }
+
   .evs-feature-icon {
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
   }
 
   .evs-feature {
-    grid-template-columns: 42px 1fr;
+    grid-template-columns: 38px 1fr;
     gap: 10px;
   }
 
   .evs-message-card {
-    margin-top: 18px;
-    margin-bottom: 44px;
-    padding: 13px 16px;
+    margin-top: 12px;
+    margin-bottom: 42px;
+    padding: 10px 14px;
   }
 
   .evs-form-panel {
@@ -701,5 +661,105 @@
 
   .evs-login-footer {
     margin-top: 24px;
+  }
+}
+
+@media (min-width: 1021px) and (max-height: 700px) {
+  .evs-brand-panel {
+    padding-top: 22px;
+    padding-bottom: 20px;
+  }
+
+  .evs-logo {
+    width: min(220px, 72%);
+  }
+
+  .evs-headline {
+    margin-top: 22px;
+  }
+
+  .evs-headline h1 {
+    font-size: 34px;
+  }
+
+  .evs-headline p {
+    margin-top: 11px;
+    line-height: 1.4;
+  }
+
+  .evs-feature-grid {
+    gap: 11px 16px;
+    margin-top: 17px;
+  }
+
+  .evs-feature-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .evs-feature {
+    grid-template-columns: 38px 1fr;
+  }
+
+  .evs-message-card {
+    margin-top: 12px;
+    margin-bottom: 52px;
+    padding: 10px 14px;
+  }
+
+  .evs-form-panel {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .evs-form-badge {
+    width: 62px;
+    height: 62px;
+  }
+
+  .evs-leaf-mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .evs-form-header {
+    margin-top: 12px;
+  }
+
+  .evs-form-header h2 {
+    font-size: 29px;
+  }
+
+  .evs-form-header p {
+    margin-top: 7px;
+  }
+
+  .evs-form {
+    margin-top: 17px;
+  }
+
+  .evs-field + .evs-field {
+    margin-top: 11px;
+  }
+
+  .evs-label {
+    margin-bottom: 6px;
+  }
+
+  .evs-input-wrap input,
+  .evs-submit {
+    height: 48px;
+  }
+
+  .evs-form-options {
+    margin-top: 11px;
+  }
+
+  .evs-submit {
+    margin-top: 14px;
+  }
+
+  .evs-login-footer {
+    margin-top: 16px;
   }
 }

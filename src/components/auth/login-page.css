@@ -26,10 +26,10 @@
 }
 
 .evs-login-card {
-  width: min(1540px, 100%);
-  min-height: min(920px, calc(100vh - 40px));
+  width: min(1360px, 100%);
+  min-height: min(810px, calc(100vh - 40px));
   display: grid;
-  grid-template-columns: minmax(360px, 1.02fr) minmax(320px, 0.8fr) minmax(430px, 1.18fr);
+  grid-template-columns: minmax(320px, 1.02fr) minmax(280px, 0.8fr) minmax(380px, 1.18fr);
   overflow: hidden;
   border: 1px solid rgb(193 205 196 / 75%);
   border-radius: 42px;
@@ -40,7 +40,23 @@
 .evs-brand-panel {
   position: relative;
   overflow: hidden;
-  padding: clamp(40px, 4vw, 72px) clamp(34px, 3.2vw, 55px);
+  padding: clamp(34px, 3.4vw, 58px) clamp(30px, 2.8vw, 48px);
+}
+
+.evs-brand-panel::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: -18px;
+  bottom: -16px;
+  width: 300px;
+  height: 150px;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgb(226 234 216 / 85%) 0 48%, transparent 50%) 0 0 / 76px
+      70px,
+    radial-gradient(ellipse at 100% 50%, rgb(226 234 216 / 72%) 0 48%, transparent 50%) 38px 35px /
+      76px 70px;
 }
 
 .evs-brand-copy {
@@ -60,8 +76,8 @@
 
 .evs-logo-mark {
   position: relative;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   flex: 0 0 auto;
   border: 3px solid var(--evs-green);
   border-radius: 50%;
@@ -69,10 +85,10 @@
 
 .evs-logo-mark span {
   position: absolute;
-  width: 23px;
-  height: 35px;
-  left: 14px;
-  top: 7px;
+  width: 20px;
+  height: 31px;
+  left: 12px;
+  top: 6px;
   border-radius: 100% 0;
   background: var(--evs-lime);
   transform: rotate(30deg);
@@ -84,7 +100,7 @@
 }
 
 .evs-logo-copy strong {
-  font-size: clamp(20px, 1.7vw, 27px);
+  font-size: clamp(19px, 1.45vw, 24px);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -98,12 +114,12 @@
 }
 
 .evs-headline {
-  margin-top: clamp(54px, 8vh, 110px);
+  margin-top: clamp(44px, 6.5vh, 82px);
 }
 
 .evs-headline h1 {
   margin: 0;
-  font-size: clamp(38px, 2.5vw, 48px);
+  font-size: clamp(35px, 2.2vw, 43px);
   line-height: 1.07;
   letter-spacing: -0.045em;
   font-weight: 750;
@@ -115,24 +131,24 @@
 }
 
 .evs-headline p {
-  margin: 26px 0 0;
+  margin: 21px 0 0;
   color: var(--evs-muted);
-  font-size: clamp(16px, 1.15vw, 20px);
+  font-size: clamp(15px, 1vw, 17px);
   line-height: 1.55;
 }
 
 .evs-feature-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 22px;
-  margin-top: 46px;
+  gap: 22px 18px;
+  margin-top: 34px;
 }
 
 .evs-feature {
   min-width: 0;
   display: grid;
-  grid-template-columns: 50px 1fr;
-  gap: 14px;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
 }
 
 .evs-feature-icon,
@@ -144,9 +160,9 @@
 }
 
 .evs-feature-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
 }
 
 .evs-feature strong,
@@ -158,7 +174,7 @@
 
 .evs-feature strong {
   margin-top: 2px;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.25;
 }
 
@@ -166,19 +182,21 @@
 .evs-message-card span {
   margin-top: 6px;
   color: var(--evs-muted);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.4;
 }
 
 .evs-message-card {
+  position: relative;
+  z-index: 4;
   width: min(440px, 100%);
   display: grid;
-  grid-template-columns: 50px 1fr;
-  gap: 15px;
+  grid-template-columns: 44px 1fr;
+  gap: 13px;
   align-items: center;
   margin-top: auto;
-  margin-bottom: 44px;
-  padding: 19px 22px;
+  margin-bottom: 92px;
+  padding: 15px 18px;
   border: 1px solid rgb(211 222 214 / 85%);
   border-radius: 20px;
   background: rgb(255 255 255 / 93%);
@@ -186,17 +204,18 @@
 }
 
 .evs-message-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
 }
 
 .evs-message-card strong {
   color: var(--evs-green-dark);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .evs-arc-left {
+  z-index: 2;
   position: absolute;
   left: -80px;
   bottom: -160px;
@@ -253,7 +272,7 @@
   min-width: 0;
   display: grid;
   place-items: center;
-  padding: clamp(48px, 5vw, 86px);
+  padding: clamp(40px, 4vw, 68px);
   background: radial-gradient(circle at 50% 0%, rgb(233 248 238 / 65%), transparent 24rem), #fff;
 }
 
@@ -263,8 +282,8 @@
 }
 
 .evs-form-badge {
-  width: 96px;
-  height: 96px;
+  width: 82px;
+  height: 82px;
   display: grid;
   place-items: center;
   margin: 0 auto;
@@ -273,25 +292,25 @@
 }
 
 .evs-leaf-mark {
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border: 2px solid var(--evs-green);
   border-radius: 50%;
   color: var(--evs-green);
-  font-size: 31px;
+  font-size: 27px;
   transform: rotate(-40deg);
 }
 
 .evs-form-header {
-  margin-top: 30px;
+  margin-top: 24px;
   text-align: center;
 }
 
 .evs-form-header h2 {
   margin: 0;
-  font-size: clamp(30px, 2.2vw, 42px);
+  font-size: clamp(28px, 1.9vw, 36px);
   line-height: 1.1;
   letter-spacing: -0.035em;
 }
@@ -302,7 +321,7 @@
 }
 
 .evs-form {
-  margin-top: 44px;
+  margin-top: 34px;
 }
 
 .evs-field {
@@ -310,7 +329,7 @@
 }
 
 .evs-field + .evs-field {
-  margin-top: 24px;
+  margin-top: 19px;
 }
 
 .evs-label {
@@ -328,7 +347,7 @@
 
 .evs-input-wrap input {
   width: 100%;
-  height: 62px;
+  height: 56px;
   padding: 0 52px;
   border: 1px solid var(--evs-border);
   border-radius: 13px;
@@ -376,7 +395,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  margin-top: 22px;
+  margin-top: 18px;
 }
 
 .evs-check {
@@ -415,12 +434,12 @@
 
 .evs-submit {
   width: 100%;
-  height: 62px;
+  height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 11px;
-  margin-top: 30px;
+  margin-top: 24px;
   border: 0;
   border-radius: 13px;
   color: #fff;
@@ -456,7 +475,7 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  margin-top: 54px;
+  margin-top: 38px;
   text-align: center;
 }
 
@@ -631,7 +650,7 @@
 
   .evs-message-card {
     margin-top: 18px;
-    margin-bottom: 0;
+    margin-bottom: 44px;
     padding: 13px 16px;
   }
 

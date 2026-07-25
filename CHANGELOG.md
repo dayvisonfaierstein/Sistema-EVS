@@ -8,6 +8,14 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.4] - 2026-07-25
+
+### Alterado
+
+- Reposicionamento do conteúdo institucional para mais próximo do logo;
+- Remoção da área branca excedente no arquivo do logo;
+- Preservação da posição do arco verde-limão e da marca-d'água inferior.
+
 ## [0.2.3] - 2026-07-25
 
 ### Alterado

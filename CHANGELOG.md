@@ -8,6 +8,14 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.2] - 2026-07-25
+
+### Alterado
+
+- Reposicionamento do card institucional na área esquerda do login;
+- Inclusão de padrão orgânico em marca d’água no rodapé do painel;
+- Preservação do arco verde-limão e dos ícones existentes.
+
 ## [0.2.1] - 2026-07-25
 
 ### Alterado

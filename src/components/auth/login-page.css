@@ -43,6 +43,22 @@
   padding: clamp(34px, 3.4vw, 58px) clamp(30px, 2.8vw, 48px);
 }
 
+.evs-brand-panel::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: -18px;
+  bottom: -16px;
+  width: 300px;
+  height: 150px;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgb(226 234 216 / 85%) 0 48%, transparent 50%) 0 0 / 76px
+      70px,
+    radial-gradient(ellipse at 100% 50%, rgb(226 234 216 / 72%) 0 48%, transparent 50%) 38px 35px /
+      76px 70px;
+}
+
 .evs-brand-copy {
   position: relative;
   z-index: 3;
@@ -171,13 +187,15 @@
 }
 
 .evs-message-card {
+  position: relative;
+  z-index: 4;
   width: min(440px, 100%);
   display: grid;
   grid-template-columns: 44px 1fr;
   gap: 13px;
   align-items: center;
   margin-top: auto;
-  margin-bottom: 28px;
+  margin-bottom: 92px;
   padding: 15px 18px;
   border: 1px solid rgb(211 222 214 / 85%);
   border-radius: 20px;
@@ -197,6 +215,7 @@
 }
 
 .evs-arc-left {
+  z-index: 2;
   position: absolute;
   left: -80px;
   bottom: -160px;
@@ -631,7 +650,7 @@
 
   .evs-message-card {
     margin-top: 18px;
-    margin-bottom: 0;
+    margin-bottom: 44px;
     padding: 13px 16px;
   }
 

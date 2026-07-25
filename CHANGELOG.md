@@ -8,6 +8,14 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.2.3] - 2026-07-25
+
+### Alterado
+
+- Ajuste da tela de login para caber integralmente no desktop sem barra de rolagem;
+- Substituição da marca provisória pelo logo institucional do Espaço Vida Saudável;
+- Refinamento do arco verde-limão e da marca-d'água inferior em uma única faixa.
+
 ## [0.2.2] - 2026-07-25
 
 ### Alterado

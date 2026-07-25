@@ -217,15 +217,11 @@ export default function LoginPage({
 
 function Brand() {
   return (
-    <div className="evs-logo" aria-label="Espaço Vida Saudável">
-      <span className="evs-logo-mark" aria-hidden="true">
-        <span />
-      </span>
-      <span className="evs-logo-copy">
-        <strong>Espaço Vida Saudável</strong>
-        <small>Bem-estar e resultados</small>
-      </span>
-    </div>
+    <img
+      className="evs-logo"
+      src="/images/logo-espaco-vida-saudavel.png"
+      alt="Espaço Vida Saudável — Herbalife Nutrition"
+    />
   );
 }
 

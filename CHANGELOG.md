@@ -8,6 +8,14 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.1] - 2026-07-27
+
+### Alterado
+
+- Identidade visual da tela de login atualizada com a logo oficial do Espaço+;
+- Logo do Espaço+ adicionada ao cabeçalho da barra lateral;
+- Referências visuais a “Espaço Vida Saudável” substituídas pela identidade do sistema nos pontos alterados.
+
 ## [0.6.0] - 2026-07-27
 
 ### Adicionado

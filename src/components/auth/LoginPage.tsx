@@ -205,7 +205,7 @@ export default function LoginPage({
               {showGoogleLogin && null}
             </form>
             <footer className="evs-login-footer">
-              <strong>Espaço Vida Saudável — {unitName}</strong>
+              <strong>Espaço+ — {unitName}</strong>
               <span>Espaço+ • Sistema de Gestão • {version}</span>
             </footer>
           </div>
@@ -216,13 +216,7 @@ export default function LoginPage({
 }
 
 function Brand() {
-  return (
-    <img
-      className="evs-logo"
-      src="/images/logo-espaco-vida-saudavel.png"
-      alt="Espaço Vida Saudável — Herbalife Nutrition"
-    />
-  );
+  return <img className="evs-logo" src="/images/logo-espaco-mais.png" alt="Espaço+" />;
 }
 
 function Feature({

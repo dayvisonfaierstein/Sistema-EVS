@@ -15,7 +15,6 @@ import {
   FileBarChart,
   Shield,
   Settings,
-  Leaf,
 } from "lucide-react";
 import {
   Sidebar,
@@ -89,13 +88,15 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-            <Leaf className="size-5" />
-          </div>
+          <img
+            src="/images/logo-espaco-mais-icon.png"
+            alt="Espaço+"
+            className="size-9 shrink-0 rounded-xl object-contain"
+          />
           {!collapsed && (
             <div className="min-w-0">
               <div className="truncate text-sm font-bold leading-tight">Espaço+</div>
-              <div className="truncate text-[11px] text-muted-foreground">Vida Saudável</div>
+              <div className="truncate text-[11px] text-muted-foreground">Sistema de Gestão</div>
             </div>
           )}
         </div>

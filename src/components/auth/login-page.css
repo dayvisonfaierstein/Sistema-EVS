@@ -70,14 +70,14 @@
 
 .evs-logo {
   display: block;
-  width: min(220px, 72%);
-  height: auto;
+  width: min(180px, 62%);
+  height: 118px;
   object-fit: contain;
   object-position: left center;
 }
 
 .evs-headline {
-  margin-top: clamp(68px, 7.5vh, 80px);
+  margin-top: clamp(24px, 3.5vh, 40px);
 }
 
 .evs-headline h1 {
@@ -576,11 +576,12 @@
   }
 
   .evs-logo {
-    width: min(220px, 72%);
+    width: min(168px, 60%);
+    height: 104px;
   }
 
   .evs-headline {
-    margin-top: 72px;
+    margin-top: 18px;
   }
 
   .evs-headline h1 {
@@ -671,11 +672,12 @@
   }
 
   .evs-logo {
-    width: min(220px, 72%);
+    width: min(150px, 56%);
+    height: 88px;
   }
 
   .evs-headline {
-    margin-top: 54px;
+    margin-top: 10px;
   }
 
   .evs-headline h1 {

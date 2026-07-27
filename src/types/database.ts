@@ -59,6 +59,7 @@ export type Assessment = {
   subcutaneous_fat_percentage: number | null;
   muscle_mass: number | null;
   muscle_percentage: number | null;
+  skeletal_muscle_percentage: number | null;
   fat_mass: number | null;
   lean_mass: number | null;
   fat_free_mass: number | null;

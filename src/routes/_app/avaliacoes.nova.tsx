@@ -54,6 +54,7 @@ const initialForm: AssessmentFormData = {
   body_fat_percentage: "",
   subcutaneous_fat_percentage: "",
   muscle_percentage: "",
+  skeletal_muscle_percentage: "",
   muscle_mass: "",
   fat_mass: "",
   body_water_percentage: "",
@@ -123,6 +124,7 @@ function NewAssessmentPage() {
         form.body_fat_percentage,
         form.subcutaneous_fat_percentage,
         form.muscle_percentage,
+        form.skeletal_muscle_percentage,
         form.body_water_percentage,
         form.protein_percentage,
       ];
@@ -164,6 +166,7 @@ function NewAssessmentPage() {
         body_fat_percentage: numberOrNull(form.body_fat_percentage),
         subcutaneous_fat_percentage: numberOrNull(form.subcutaneous_fat_percentage),
         muscle_percentage: numberOrNull(form.muscle_percentage),
+        skeletal_muscle_percentage: numberOrNull(form.skeletal_muscle_percentage),
         muscle_mass: numberOrNull(form.muscle_mass),
         fat_mass: numberOrNull(form.fat_mass),
         body_water_percentage: numberOrNull(form.body_water_percentage),

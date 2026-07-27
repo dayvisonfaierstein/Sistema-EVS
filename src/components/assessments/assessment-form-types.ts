@@ -14,6 +14,7 @@ export type AssessmentFormData = {
   body_fat_percentage: string;
   subcutaneous_fat_percentage: string;
   muscle_percentage: string;
+  skeletal_muscle_percentage: string;
   muscle_mass: string;
   fat_mass: string;
   body_water_percentage: string;

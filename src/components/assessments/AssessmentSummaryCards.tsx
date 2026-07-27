@@ -17,9 +17,11 @@ export function AssessmentSummaryCards({ assessment }: { assessment: Assessment 
     ["IMC", assessment.bmi, "", bmiReference],
     ["Gordura corporal", assessment.body_fat_percentage, "%", null],
     ["Massa muscular", assessment.muscle_mass, "kg", null],
+    ["Taxa muscular", assessment.muscle_percentage, "%", null],
+    ["Músculo esquelético", assessment.skeletal_muscle_percentage, "%", null],
     ["Gordura visceral", assessment.visceral_fat, "", null],
     ["Metabolismo basal", assessment.basal_metabolic_rate, "kcal", null],
-    ["Idade corporal", assessment.metabolic_age, "anos", null],
+    ["Idade metabólica", assessment.metabolic_age, "anos", null],
   ] as const;
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

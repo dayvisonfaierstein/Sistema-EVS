@@ -19,8 +19,9 @@ export function BioimpedanceAssessmentStep({
     ["bone_mass", "Massa óssea", "kg", undefined],
     ["protein_percentage", "Proteína", "%", 100],
     ["basal_metabolic_rate", "Metabolismo basal", "kcal", undefined],
-    ["metabolic_age", "Idade corporal", "anos", 130],
-    ["muscle_percentage", "Massa muscular (opcional)", "%", 100],
+    ["metabolic_age", "Idade metabólica", "anos", 130],
+    ["muscle_percentage", "Taxa muscular", "%", 100],
+    ["skeletal_muscle_percentage", "Massa muscular esquelética", "%", 100],
     ["fat_mass", "Massa de gordura", "kg", undefined],
     ["fat_free_mass", "Massa livre de gordura", "kg", undefined],
   ];

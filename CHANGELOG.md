@@ -8,6 +8,19 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.0] - 2026-07-27
+
+### Adicionado
+
+- Campo Massa muscular esquelética (%) nas avaliações de bioimpedância;
+- Exibição do novo indicador na revisão, resumo, relatório e gráficos de evolução;
+- Migração do Supabase para armazenar o indicador no histórico das avaliações.
+
+### Alterado
+
+- Campo Massa muscular (%) renomeado para Taxa muscular (%);
+- Indicador Idade corporal renomeado para Idade metabólica.
+
 ## [0.5.3] - 2026-07-27
 
 ### Corrigido

@@ -102,6 +102,8 @@ function AssessmentReportPage() {
             ["Gordura visceral", data.visceral_fat, "nível"],
             ["Água corporal", data.body_water_percentage, "%"],
             ["Massa muscular", data.muscle_mass, "kg"],
+            ["Taxa muscular", data.muscle_percentage, "%"],
+            ["Massa muscular esquelética", data.skeletal_muscle_percentage, "%"],
             ["Massa óssea", data.bone_mass, "kg"],
             ["Proteína", data.protein_percentage, "%"],
             ["Massa livre de gordura", data.fat_free_mass, "kg"],
@@ -160,7 +162,7 @@ function AssessmentReportPage() {
         </Card>
         <Card className="break-inside-avoid">
           <CardHeader>
-            <CardTitle>Metabolismo e idade corporal</CardTitle>
+            <CardTitle>Metabolismo e idade metabólica</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-muted p-4">
@@ -173,7 +175,7 @@ function AssessmentReportPage() {
               </p>
             </div>
             <div className="rounded-xl bg-muted p-4">
-              <p className="text-sm text-muted-foreground">Idade corporal</p>
+              <p className="text-sm text-muted-foreground">Idade metabólica</p>
               <strong className="mt-2 block text-2xl">{data.metabolic_age ?? "—"} anos</strong>
               <p className="mt-2 text-xs text-muted-foreground">
                 Idade cronológica na avaliação: {data.age_at_assessment ?? "—"} anos

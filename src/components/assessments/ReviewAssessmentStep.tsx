@@ -32,12 +32,17 @@ export function ReviewAssessmentStep({
           form.subcutaneous_fat_percentage ? `${form.subcutaneous_fat_percentage}%` : "—",
         ],
         ["Massa muscular", form.muscle_mass ? `${form.muscle_mass} kg` : "—"],
+        ["Taxa muscular", form.muscle_percentage ? `${form.muscle_percentage}%` : "—"],
+        [
+          "Massa muscular esquelética",
+          form.skeletal_muscle_percentage ? `${form.skeletal_muscle_percentage}%` : "—",
+        ],
         ["Gordura visceral", form.visceral_fat || "—"],
         [
           "Metabolismo basal",
           form.basal_metabolic_rate ? `${form.basal_metabolic_rate} kcal` : "—",
         ],
-        ["Idade corporal", form.metabolic_age ? `${form.metabolic_age} anos` : "—"],
+        ["Idade metabólica", form.metabolic_age ? `${form.metabolic_age} anos` : "—"],
       ],
     },
     {

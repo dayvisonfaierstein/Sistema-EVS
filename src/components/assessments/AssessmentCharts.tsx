@@ -41,6 +41,7 @@ export function AssessmentCharts({ assessments }: { assessments: Assessment[] })
         bmi: assessment.bmi,
         fat: assessment.body_fat_percentage,
         muscle: assessment.muscle_mass,
+        skeletalMuscle: assessment.skeletal_muscle_percentage,
         visceral: assessment.visceral_fat,
       }));
   }, [assessments, period]);
@@ -49,6 +50,7 @@ export function AssessmentCharts({ assessments }: { assessments: Assessment[] })
     ["IMC", "bmi", "", "#2563eb"],
     ["Gordura corporal", "fat", "%", "#d97706"],
     ["Massa muscular", "muscle", "kg", "#059669"],
+    ["Músculo esquelético", "skeletalMuscle", "%", "#0d9488"],
     ["Gordura visceral", "visceral", "", "#7c3aed"],
   ];
   return (

@@ -104,6 +104,22 @@ export async function getClientPhotoUrl(path?: string | null) {
   return data.signedUrl;
 }
 
+export async function getClientPhotoUrls(paths: Array<string | null>) {
+  const uniquePaths = [...new Set(paths.filter((path): path is string => Boolean(path)))];
+  if (!uniquePaths.length) return {} as Record<string, string>;
+
+  const { data, error } = await getSupabase()
+    .storage.from("client-photos")
+    .createSignedUrls(uniquePaths, 60 * 60);
+  if (error) throw error;
+
+  return Object.fromEntries(
+    (data ?? [])
+      .filter((item) => item.signedUrl)
+      .map((item, index) => [uniquePaths[index], item.signedUrl]),
+  ) as Record<string, string>;
+}
+
 export async function getClient(id: string) {
   const { data, error } = await getSupabase().from("clients").select("*").eq("id", id).single();
   if (error) throw error;

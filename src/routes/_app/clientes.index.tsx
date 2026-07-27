@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { listClients } from "@/services/clients";
+import { getClientPhotoUrls, listClients } from "@/services/clients";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/clientes/")({
@@ -37,6 +37,12 @@ function ClientesPage() {
     enabled: configured,
   });
   const clients = query.data?.clients ?? [];
+  const photoPaths = clients.map((client) => client.photo_url);
+  const photos = useQuery({
+    queryKey: ["client-photos", photoPaths],
+    queryFn: () => getClientPhotoUrls(photoPaths),
+    enabled: photoPaths.some(Boolean),
+  });
   return (
     <div className="space-y-5">
       <PageHeader
@@ -133,6 +139,10 @@ function ClientesPage() {
                         className="flex items-center gap-3 font-medium hover:underline"
                       >
                         <Avatar className="size-9">
+                          <AvatarImage
+                            src={client.photo_url ? photos.data?.[client.photo_url] : undefined}
+                            alt={client.full_name}
+                          />
                           <AvatarFallback>{client.full_name[0]}</AvatarFallback>
                         </Avatar>
                         {client.full_name}
@@ -161,6 +171,10 @@ function ClientesPage() {
             <Card key={client.id}>
               <CardContent className="p-5">
                 <Avatar className="mb-3 size-14">
+                  <AvatarImage
+                    src={client.photo_url ? photos.data?.[client.photo_url] : undefined}
+                    alt={client.full_name}
+                  />
                   <AvatarFallback>{client.full_name[0]}</AvatarFallback>
                 </Avatar>
                 <div className="font-semibold">{client.full_name}</div>

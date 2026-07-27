@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.5.1] - 2026-07-27
+
+### Corrigido
+
+- Exibição das fotos dos clientes nos avatares da tabela e da visualização em cartões;
+- Geração segura e agrupada de URLs temporárias para fotos armazenadas no bucket privado.
+
 ## [0.5.0] - 2026-07-27
 
 ### Adicionado

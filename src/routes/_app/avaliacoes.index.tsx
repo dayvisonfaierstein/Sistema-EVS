@@ -5,9 +5,10 @@ import { useState } from "react";
 import { PageHeader } from "@/components/layout/PageChrome";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { listAssessments } from "@/services/assessments";
-import { listClients } from "@/services/clients";
+import { getClientPhotoUrls, listClients } from "@/services/clients";
 
 export const Route = createFileRoute("/_app/avaliacoes/")({
   head: () => ({ meta: [{ title: "Avaliações corporais — Espaço+" }] }),
@@ -25,9 +26,14 @@ function AssessmentsPage() {
     queryKey: ["assessment-client-map"],
     queryFn: () => listClients("", 0, 500),
   });
-  const clientMap = new Map(
-    allClients.data?.clients.map((client) => [client.id, client.full_name]),
-  );
+  const allClientItems = allClients.data?.clients ?? [];
+  const clientMap = new Map(allClientItems.map((client) => [client.id, client]));
+  const photoPaths = allClientItems.map((client) => client.photo_url);
+  const photos = useQuery({
+    queryKey: ["assessment-client-photos", photoPaths],
+    queryFn: () => getClientPhotoUrls(photoPaths),
+    enabled: photoPaths.some(Boolean),
+  });
   return (
     <div className="space-y-5">
       <PageHeader
@@ -65,19 +71,28 @@ function AssessmentsPage() {
                 const latest = assessments.data?.find((item) => item.client_id === client.id);
                 return (
                   <div key={client.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="min-w-0">
-                      <Link
-                        to="/clientes/$id"
-                        params={{ id: client.id }}
-                        className="truncate font-medium hover:text-primary"
-                      >
-                        {client.full_name}
-                      </Link>
-                      <p className="text-xs text-muted-foreground">
-                        {latest
-                          ? `Última: ${new Date(`${latest.assessment_date}T12:00:00`).toLocaleDateString("pt-BR")}`
-                          : "Sem avaliação"}
-                      </p>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <Avatar className="size-10 shrink-0">
+                        <AvatarImage
+                          src={client.photo_url ? photos.data?.[client.photo_url] : undefined}
+                          alt={client.full_name}
+                        />
+                        <AvatarFallback>{client.full_name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <Link
+                          to="/clientes/$id"
+                          params={{ id: client.id }}
+                          className="block truncate font-medium hover:text-primary"
+                        >
+                          {client.full_name}
+                        </Link>
+                        <p className="text-xs text-muted-foreground">
+                          {latest
+                            ? `Última: ${new Date(`${latest.assessment_date}T12:00:00`).toLocaleDateString("pt-BR")}`
+                            : "Sem avaliação"}
+                        </p>
+                      </div>
                     </div>
                     <Button size="sm" variant={latest ? "outline" : "default"} asChild>
                       <Link to="/avaliacoes/nova" search={{ clientId: client.id }}>
@@ -103,11 +118,28 @@ function AssessmentsPage() {
                 key={assessment.id}
                 className="grid gap-3 py-4 sm:grid-cols-[1fr_repeat(3,auto)_auto] sm:items-center"
               >
-                <div>
-                  <strong>{clientMap.get(assessment.client_id) || "Cliente"}</strong>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(`${assessment.assessment_date}T12:00:00`).toLocaleDateString("pt-BR")}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="size-10 shrink-0">
+                    <AvatarImage
+                      src={
+                        clientMap.get(assessment.client_id)?.photo_url
+                          ? photos.data?.[clientMap.get(assessment.client_id)!.photo_url!]
+                          : undefined
+                      }
+                      alt={clientMap.get(assessment.client_id)?.full_name || "Cliente"}
+                    />
+                    <AvatarFallback>
+                      {clientMap.get(assessment.client_id)?.full_name?.charAt(0) || "C"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <strong>{clientMap.get(assessment.client_id)?.full_name || "Cliente"}</strong>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(`${assessment.assessment_date}T12:00:00`).toLocaleDateString(
+                        "pt-BR",
+                      )}
+                    </p>
+                  </div>
                 </div>
                 <span className="text-sm">{assessment.weight ?? "—"} kg</span>
                 <span className="text-sm">IMC {assessment.bmi ?? "—"}</span>

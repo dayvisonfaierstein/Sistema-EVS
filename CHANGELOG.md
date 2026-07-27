@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.5.2] - 2026-07-27
+
+### Adicionado
+
+- Fotos dos clientes na seleção para iniciar ou refazer uma avaliação;
+- Fotos dos clientes nos registros do histórico recente de avaliações.
+
 ## [0.5.1] - 2026-07-27
 
 ### Corrigido

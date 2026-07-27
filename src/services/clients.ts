@@ -25,12 +25,18 @@ export async function createClient(input: Partial<Client>, photo?: File | null) 
   const { data, error } = await supabase.from("clients").insert(payload).select().single();
   if (error) throw error;
   if (photo) {
-    if (!photo.type.startsWith("image/") || photo.size > 5 * 1024 * 1024)
-      throw new Error("A foto deve ser uma imagem de até 5 MB.");
-    const path = `${profile.organization_id}/${data.id}/profile/${crypto.randomUUID()}-${photo.name}`;
-    const upload = await supabase.storage.from("client-photos").upload(path, photo);
+    if (photo.type !== "image/jpeg" || photo.size > 2 * 1024 * 1024)
+      throw new Error("A foto processada é inválida ou excede 2 MB.");
+    const path = `${profile.organization_id}/${data.id}/profile/${crypto.randomUUID()}.jpg`;
+    const upload = await supabase.storage
+      .from("client-photos")
+      .upload(path, photo, { contentType: "image/jpeg", cacheControl: "31536000" });
     if (upload.error) throw upload.error;
-    await supabase.from("clients").update({ photo_url: path }).eq("id", data.id);
+    const photoUpdate = await supabase
+      .from("clients")
+      .update({ photo_url: path })
+      .eq("id", data.id);
+    if (photoUpdate.error) throw photoUpdate.error;
   }
   return data as Client;
 }

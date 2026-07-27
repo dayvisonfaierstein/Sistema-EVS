@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutGrid, List, Plus, Search } from "lucide-react";
+import { LayoutGrid, List, LogIn, Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageChrome";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,12 +47,20 @@ function ClientesPage() {
             : "Conecte o Supabase para visualizar dados reais"
         }
         actions={
-          <Button asChild>
-            <Link to="/clientes/novo">
-              <Plus />
-              Novo cliente
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline">
+              <Link to="/acessos">
+                <LogIn />
+                Registrar acesso
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link to="/clientes/novo">
+                <Plus />
+                Novo cliente
+              </Link>
+            </Button>
+          </div>
         }
       />
       <Card>

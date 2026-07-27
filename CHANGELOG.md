@@ -8,6 +8,20 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.4.0] - 2026-07-27
+
+### Adicionado
+
+- Editor profissional de foto no cadastro do cliente com recorte quadrado, reposicionamento, zoom e suporte a gestos;
+- Redimensionamento automático para 600 × 600 px e otimização JPEG antes do upload;
+- Validação de formato e tamanho, prévia final, loading, cancelamento, troca e remoção da foto;
+- Atalho Registrar acesso no cabeçalho da página Clientes.
+
+### Alterado
+
+- Remoção do item redundante Novo cadastro do menu lateral;
+- Upload do cliente passa a armazenar somente a foto recortada e otimizada.
+
 ## [0.3.1] - 2026-07-27
 
 ### Corrigido

@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Users,
-  UserPlus,
   ClipboardList,
   LogIn,
   Calendar,
@@ -36,7 +35,6 @@ import { APP_VERSION_LABEL } from "@/lib/version";
 const principal = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Novo cadastro", url: "/clientes/novo", icon: UserPlus },
   { title: "Avaliações", url: "/avaliacoes", icon: ClipboardList },
   { title: "Acessos", url: "/acessos", icon: LogIn },
   { title: "Agenda", url: "/agenda", icon: Calendar },

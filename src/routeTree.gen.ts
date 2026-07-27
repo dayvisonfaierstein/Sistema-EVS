@@ -29,6 +29,7 @@ import { Route as AppAvaliacoesRouteImport } from './routes/_app/avaliacoes'
 import { Route as AppAgendaRouteImport } from './routes/_app/agenda'
 import { Route as AppAcessosRouteImport } from './routes/_app/acessos'
 import { Route as AppClientesIndexRouteImport } from './routes/_app/clientes.index'
+import { Route as AppAvaliacoesIndexRouteImport } from './routes/_app/avaliacoes.index'
 import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo'
 import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
 import { Route as AppAvaliacoesNovaRouteImport } from './routes/_app/avaliacoes.nova'
@@ -133,6 +134,11 @@ const AppClientesIndexRoute = AppClientesIndexRouteImport.update({
   path: '/clientes/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAvaliacoesIndexRoute = AppAvaliacoesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAvaliacoesRoute,
+} as any)
 const AppClientesNovoRoute = AppClientesNovoRouteImport.update({
   id: '/clientes/novo',
   path: '/clientes/novo',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
+  '/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/clientes/': typeof AppClientesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -186,7 +193,6 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalRoute
   '/acessos': typeof AppAcessosRoute
   '/agenda': typeof AppAgendaRoute
-  '/avaliacoes': typeof AppAvaliacoesRouteWithChildren
   '/campanhas': typeof AppCampanhasRoute
   '/configuracoes': typeof AppConfiguracoesRoute
   '/dashboard': typeof AppDashboardRoute
@@ -202,6 +208,7 @@ export interface FileRoutesByTo {
   '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
+  '/avaliacoes': typeof AppAvaliacoesIndexRoute
   '/clientes': typeof AppClientesIndexRoute
 }
 export interface FileRoutesById {
@@ -229,6 +236,7 @@ export interface FileRoutesById {
   '/_app/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/_app/clientes/$id': typeof AppClientesIdRoute
   '/_app/clientes/novo': typeof AppClientesNovoRoute
+  '/_app/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/_app/clientes/': typeof AppClientesIndexRoute
 }
 export interface FileRouteTypes {
@@ -256,6 +264,7 @@ export interface FileRouteTypes {
     | '/avaliacoes/nova'
     | '/clientes/$id'
     | '/clientes/novo'
+    | '/avaliacoes/'
     | '/clientes/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -265,7 +274,6 @@ export interface FileRouteTypes {
     | '/portal'
     | '/acessos'
     | '/agenda'
-    | '/avaliacoes'
     | '/campanhas'
     | '/configuracoes'
     | '/dashboard'
@@ -281,6 +289,7 @@ export interface FileRouteTypes {
     | '/avaliacoes/nova'
     | '/clientes/$id'
     | '/clientes/novo'
+    | '/avaliacoes'
     | '/clientes'
   id:
     | '__root__'
@@ -307,6 +316,7 @@ export interface FileRouteTypes {
     | '/_app/avaliacoes/nova'
     | '/_app/clientes/$id'
     | '/_app/clientes/novo'
+    | '/_app/avaliacoes/'
     | '/_app/clientes/'
   fileRoutesById: FileRoutesById
 }
@@ -460,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientesIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/avaliacoes/': {
+      id: '/_app/avaliacoes/'
+      path: '/'
+      fullPath: '/avaliacoes/'
+      preLoaderRoute: typeof AppAvaliacoesIndexRouteImport
+      parentRoute: typeof AppAvaliacoesRoute
+    }
     '/_app/clientes/novo': {
       id: '/_app/clientes/novo'
       path: '/clientes/novo'
@@ -494,11 +511,13 @@ declare module '@tanstack/react-router' {
 interface AppAvaliacoesRouteChildren {
   AppAvaliacoesIdRoute: typeof AppAvaliacoesIdRoute
   AppAvaliacoesNovaRoute: typeof AppAvaliacoesNovaRoute
+  AppAvaliacoesIndexRoute: typeof AppAvaliacoesIndexRoute
 }
 
 const AppAvaliacoesRouteChildren: AppAvaliacoesRouteChildren = {
   AppAvaliacoesIdRoute: AppAvaliacoesIdRoute,
   AppAvaliacoesNovaRoute: AppAvaliacoesNovaRoute,
+  AppAvaliacoesIndexRoute: AppAvaliacoesIndexRoute,
 }
 
 const AppAvaliacoesRouteWithChildren = AppAvaliacoesRoute._addFileChildren(

@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.3.1] - 2026-07-27
+
+### Corrigido
+
+- Navegação dos botões Iniciar, Reavaliar e Nova avaliação;
+- Estrutura de rotas do módulo de Avaliação Corporal para renderizar corretamente o formulário.
+
 ## [0.3.0] - 2026-07-27
 
 ### Adicionado

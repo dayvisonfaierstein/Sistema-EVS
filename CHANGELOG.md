@@ -8,6 +8,26 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.3.0] - 2026-07-27
+
+### Adicionado
+
+- Módulo completo de Avaliação Corporal e Bioimpedância integrado aos clientes;
+- Formulário em cinco etapas com dados gerais, medidas, bioimpedância, objetivos e revisão;
+- Resumo de evolução corporal no perfil do cliente;
+- Comparação automática com a avaliação anterior;
+- Histórico, linha do tempo e gráficos por período;
+- Relatório visual responsivo com impressão A4 e exportação pelo navegador;
+- Módulos separados de Plano de Experiência de 3 dias e Indicações;
+- Referências e classificações corporais centralizadas para futura configuração por equipamento;
+- Migration com novos campos históricos, tabelas, índices e políticas RLS.
+
+### Mantido
+
+- Avaliações anteriores como registros independentes;
+- Autenticação, organização, perfis e isolamento de dados existentes;
+- Identidade visual, menu e componentes do sistema.
+
 ## [0.2.5] - 2026-07-25
 
 ### Alterado

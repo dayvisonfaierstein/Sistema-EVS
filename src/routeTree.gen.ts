@@ -31,6 +31,8 @@ import { Route as AppAcessosRouteImport } from './routes/_app/acessos'
 import { Route as AppClientesIndexRouteImport } from './routes/_app/clientes.index'
 import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo'
 import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
+import { Route as AppAvaliacoesNovaRouteImport } from './routes/_app/avaliacoes.nova'
+import { Route as AppAvaliacoesIdRouteImport } from './routes/_app/avaliacoes.$id'
 
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
@@ -141,6 +143,16 @@ const AppClientesIdRoute = AppClientesIdRouteImport.update({
   path: '/clientes/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAvaliacoesNovaRoute = AppAvaliacoesNovaRouteImport.update({
+  id: '/nova',
+  path: '/nova',
+  getParentRoute: () => AppAvaliacoesRoute,
+} as any)
+const AppAvaliacoesIdRoute = AppAvaliacoesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppAvaliacoesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -149,7 +161,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRoute
   '/acessos': typeof AppAcessosRoute
   '/agenda': typeof AppAgendaRoute
-  '/avaliacoes': typeof AppAvaliacoesRoute
+  '/avaliacoes': typeof AppAvaliacoesRouteWithChildren
   '/campanhas': typeof AppCampanhasRoute
   '/configuracoes': typeof AppConfiguracoesRoute
   '/dashboard': typeof AppDashboardRoute
@@ -161,6 +173,8 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/vendas': typeof AppVendasRoute
+  '/avaliacoes/$id': typeof AppAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
   '/clientes/': typeof AppClientesIndexRoute
@@ -172,7 +186,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalRoute
   '/acessos': typeof AppAcessosRoute
   '/agenda': typeof AppAgendaRoute
-  '/avaliacoes': typeof AppAvaliacoesRoute
+  '/avaliacoes': typeof AppAvaliacoesRouteWithChildren
   '/campanhas': typeof AppCampanhasRoute
   '/configuracoes': typeof AppConfiguracoesRoute
   '/dashboard': typeof AppDashboardRoute
@@ -184,6 +198,8 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/vendas': typeof AppVendasRoute
+  '/avaliacoes/$id': typeof AppAvaliacoesIdRoute
+  '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
   '/clientes': typeof AppClientesIndexRoute
@@ -197,7 +213,7 @@ export interface FileRoutesById {
   '/portal': typeof PortalRoute
   '/_app/acessos': typeof AppAcessosRoute
   '/_app/agenda': typeof AppAgendaRoute
-  '/_app/avaliacoes': typeof AppAvaliacoesRoute
+  '/_app/avaliacoes': typeof AppAvaliacoesRouteWithChildren
   '/_app/campanhas': typeof AppCampanhasRoute
   '/_app/configuracoes': typeof AppConfiguracoesRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -209,6 +225,8 @@ export interface FileRoutesById {
   '/_app/relatorios': typeof AppRelatoriosRoute
   '/_app/usuarios': typeof AppUsuariosRoute
   '/_app/vendas': typeof AppVendasRoute
+  '/_app/avaliacoes/$id': typeof AppAvaliacoesIdRoute
+  '/_app/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/_app/clientes/$id': typeof AppClientesIdRoute
   '/_app/clientes/novo': typeof AppClientesNovoRoute
   '/_app/clientes/': typeof AppClientesIndexRoute
@@ -234,6 +252,8 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/clientes/$id'
     | '/clientes/novo'
     | '/clientes/'
@@ -257,6 +277,8 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/avaliacoes/$id'
+    | '/avaliacoes/nova'
     | '/clientes/$id'
     | '/clientes/novo'
     | '/clientes'
@@ -281,6 +303,8 @@ export interface FileRouteTypes {
     | '/_app/relatorios'
     | '/_app/usuarios'
     | '/_app/vendas'
+    | '/_app/avaliacoes/$id'
+    | '/_app/avaliacoes/nova'
     | '/_app/clientes/$id'
     | '/_app/clientes/novo'
     | '/_app/clientes/'
@@ -450,13 +474,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppClientesIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/avaliacoes/nova': {
+      id: '/_app/avaliacoes/nova'
+      path: '/nova'
+      fullPath: '/avaliacoes/nova'
+      preLoaderRoute: typeof AppAvaliacoesNovaRouteImport
+      parentRoute: typeof AppAvaliacoesRoute
+    }
+    '/_app/avaliacoes/$id': {
+      id: '/_app/avaliacoes/$id'
+      path: '/$id'
+      fullPath: '/avaliacoes/$id'
+      preLoaderRoute: typeof AppAvaliacoesIdRouteImport
+      parentRoute: typeof AppAvaliacoesRoute
+    }
   }
 }
+
+interface AppAvaliacoesRouteChildren {
+  AppAvaliacoesIdRoute: typeof AppAvaliacoesIdRoute
+  AppAvaliacoesNovaRoute: typeof AppAvaliacoesNovaRoute
+}
+
+const AppAvaliacoesRouteChildren: AppAvaliacoesRouteChildren = {
+  AppAvaliacoesIdRoute: AppAvaliacoesIdRoute,
+  AppAvaliacoesNovaRoute: AppAvaliacoesNovaRoute,
+}
+
+const AppAvaliacoesRouteWithChildren = AppAvaliacoesRoute._addFileChildren(
+  AppAvaliacoesRouteChildren,
+)
 
 interface AppRouteChildren {
   AppAcessosRoute: typeof AppAcessosRoute
   AppAgendaRoute: typeof AppAgendaRoute
-  AppAvaliacoesRoute: typeof AppAvaliacoesRoute
+  AppAvaliacoesRoute: typeof AppAvaliacoesRouteWithChildren
   AppCampanhasRoute: typeof AppCampanhasRoute
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
   AppDashboardRoute: typeof AppDashboardRoute
@@ -476,7 +528,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAcessosRoute: AppAcessosRoute,
   AppAgendaRoute: AppAgendaRoute,
-  AppAvaliacoesRoute: AppAvaliacoesRoute,
+  AppAvaliacoesRoute: AppAvaliacoesRouteWithChildren,
   AppCampanhasRoute: AppCampanhasRoute,
   AppConfiguracoesRoute: AppConfiguracoesRoute,
   AppDashboardRoute: AppDashboardRoute,

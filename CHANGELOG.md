@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.5.3] - 2026-07-27
+
+### Corrigido
+
+- Exibição das fotos na seleção de clientes para registrar acesso;
+- Exibição das fotos no histórico de acessos realizados no dia.
+
 ## [0.5.2] - 2026-07-27
 
 ### Adicionado

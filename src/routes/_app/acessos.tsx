@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { listClients } from "@/services/clients";
+import { getClientPhotoUrls, listClients } from "@/services/clients";
 import { listTodayAccesses, registerAccess } from "@/services/operations";
 import { toast } from "sonner";
 
@@ -30,6 +30,15 @@ function Accesses() {
     queryFn: () => listClients(search, 0, 10),
   });
   const accesses = useQuery({ queryKey: ["today-accesses"], queryFn: listTodayAccesses });
+  const photoPaths = [
+    ...(clients.data?.clients.map((client) => client.photo_url) ?? []),
+    ...(accesses.data?.map((access) => access.clients?.photo_url ?? null) ?? []),
+  ];
+  const photos = useQuery({
+    queryKey: ["access-client-photos", photoPaths],
+    queryFn: () => getClientPhotoUrls(photoPaths),
+    enabled: photoPaths.some(Boolean),
+  });
   const current = clients.data?.clients.find((c) => c.id === selected);
   async function confirm() {
     if (!selected) return toast.error("Selecione um cliente.");
@@ -79,6 +88,10 @@ function Accesses() {
                 className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left ${selected === c.id ? "border-primary bg-primary-soft" : "border-transparent hover:bg-accent"}`}
               >
                 <Avatar>
+                  <AvatarImage
+                    src={c.photo_url ? photos.data?.[c.photo_url] : undefined}
+                    alt={c.full_name}
+                  />
                   <AvatarFallback>{c.full_name[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -131,6 +144,10 @@ function Accesses() {
           {accesses.data?.map((a) => (
             <div key={a.id} className="flex items-center gap-3 py-3">
               <Avatar>
+                <AvatarImage
+                  src={a.clients?.photo_url ? photos.data?.[a.clients.photo_url] : undefined}
+                  alt={a.clients?.full_name || "Cliente"}
+                />
                 <AvatarFallback>{a.clients?.full_name?.[0] || "C"}</AvatarFallback>
               </Avatar>
               <div className="flex-1">

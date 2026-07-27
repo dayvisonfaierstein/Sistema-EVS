@@ -34,6 +34,7 @@ import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo
 import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
 import { Route as AppAvaliacoesNovaRouteImport } from './routes/_app/avaliacoes.nova'
 import { Route as AppAvaliacoesIdRouteImport } from './routes/_app/avaliacoes.$id'
+import { Route as AppClientesEditarIdRouteImport } from './routes/_app/clientes.editar.$id'
 
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
@@ -159,6 +160,11 @@ const AppAvaliacoesIdRoute = AppAvaliacoesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppAvaliacoesRoute,
 } as any)
+const AppClientesEditarIdRoute = AppClientesEditarIdRouteImport.update({
+  id: '/clientes/editar/$id',
+  path: '/clientes/editar/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/clientes/novo': typeof AppClientesNovoRoute
   '/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/clientes/': typeof AppClientesIndexRoute
+  '/clientes/editar/$id': typeof AppClientesEditarIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/clientes/novo': typeof AppClientesNovoRoute
   '/avaliacoes': typeof AppAvaliacoesIndexRoute
   '/clientes': typeof AppClientesIndexRoute
+  '/clientes/editar/$id': typeof AppClientesEditarIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/_app/clientes/novo': typeof AppClientesNovoRoute
   '/_app/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/_app/clientes/': typeof AppClientesIndexRoute
+  '/_app/clientes/editar/$id': typeof AppClientesEditarIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/avaliacoes/'
     | '/clientes/'
+    | '/clientes/editar/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/clientes/novo'
     | '/avaliacoes'
     | '/clientes'
+    | '/clientes/editar/$id'
   id:
     | '__root__'
     | '/'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/_app/clientes/novo'
     | '/_app/avaliacoes/'
     | '/_app/clientes/'
+    | '/_app/clientes/editar/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -505,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvaliacoesIdRouteImport
       parentRoute: typeof AppAvaliacoesRoute
     }
+    '/_app/clientes/editar/$id': {
+      id: '/_app/clientes/editar/$id'
+      path: '/clientes/editar/$id'
+      fullPath: '/clientes/editar/$id'
+      preLoaderRoute: typeof AppClientesEditarIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -542,6 +561,7 @@ interface AppRouteChildren {
   AppClientesIdRoute: typeof AppClientesIdRoute
   AppClientesNovoRoute: typeof AppClientesNovoRoute
   AppClientesIndexRoute: typeof AppClientesIndexRoute
+  AppClientesEditarIdRoute: typeof AppClientesEditarIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -562,6 +582,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppClientesIdRoute: AppClientesIdRoute,
   AppClientesNovoRoute: AppClientesNovoRoute,
   AppClientesIndexRoute: AppClientesIndexRoute,
+  AppClientesEditarIdRoute: AppClientesEditarIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

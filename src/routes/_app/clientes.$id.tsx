@@ -5,14 +5,15 @@ import {
   CalendarDays,
   ClipboardList,
   FileText,
+  Pencil,
   Phone,
   UserRoundPlus,
 } from "lucide-react";
 import { z } from "zod";
-import { getClient } from "@/services/clients";
+import { getClient, getClientPhotoUrl } from "@/services/clients";
 import { listAssessments } from "@/services/assessments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -40,6 +41,11 @@ function ClientProfile() {
   const { tab = "overview" } = Route.useSearch();
   const navigate = useNavigate();
   const client = useQuery({ queryKey: ["client", id], queryFn: () => getClient(id) });
+  const photo = useQuery({
+    queryKey: ["client-photo", client.data?.photo_url],
+    queryFn: () => getClientPhotoUrl(client.data?.photo_url),
+    enabled: Boolean(client.data?.photo_url),
+  });
   const assessments = useQuery({
     queryKey: ["assessments", id],
     queryFn: () => listAssessments(id),
@@ -60,16 +66,25 @@ function ClientProfile() {
           <ArrowLeft className="size-4" />
           Clientes
         </Link>
-        <Button asChild>
-          <Link to="/avaliacoes/nova" search={{ clientId: id }}>
-            <ClipboardList />
-            Nova avaliação
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link to="/clientes/editar/$id" params={{ id }}>
+              <Pencil />
+              Editar cadastro
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/avaliacoes/nova" search={{ clientId: id }}>
+              <ClipboardList />
+              Nova avaliação
+            </Link>
+          </Button>
+        </div>
       </div>
       <Card>
         <CardContent className="flex flex-wrap items-center gap-4 p-5">
           <Avatar className="size-20">
+            <AvatarImage src={photo.data ?? undefined} alt={c.full_name} />
             <AvatarFallback>{c.full_name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">

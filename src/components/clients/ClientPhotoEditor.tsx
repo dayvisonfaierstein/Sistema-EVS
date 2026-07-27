@@ -20,10 +20,14 @@ const SUPPORTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export function ClientPhotoEditor({
   value,
+  existingUrl,
   onChange,
+  onRemove,
 }: {
   value: File | null;
+  existingUrl?: string | null;
   onChange: (file: File | null) => void;
+  onRemove?: () => void;
 }) {
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -97,7 +101,10 @@ export function ClientPhotoEditor({
     <>
       <div className="flex flex-wrap items-center gap-4">
         <Avatar className="size-24 border-2 border-primary/15 shadow-sm">
-          <AvatarImage src={previewUrl} alt="Prévia da foto do cliente" />
+          <AvatarImage
+            src={previewUrl || existingUrl || undefined}
+            alt="Prévia da foto do cliente"
+          />
           <AvatarFallback className="bg-primary/5">
             <ImageIcon className="size-8 text-primary/45" />
           </AvatarFallback>
@@ -107,7 +114,7 @@ export function ClientPhotoEditor({
             <Button type="button" variant="outline" asChild>
               <label className="cursor-pointer">
                 <Upload />
-                {value ? "Trocar foto" : "Selecionar foto"}
+                {value || existingUrl ? "Trocar foto" : "Selecionar foto"}
                 <input
                   id="photo"
                   type="file"
@@ -120,8 +127,15 @@ export function ClientPhotoEditor({
                 />
               </label>
             </Button>
-            {value && (
-              <Button type="button" variant="ghost" onClick={() => onChange(null)}>
+            {(value || existingUrl) && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  onChange(null);
+                  onRemove?.();
+                }}
+              >
                 <Trash2 />
                 Remover
               </Button>

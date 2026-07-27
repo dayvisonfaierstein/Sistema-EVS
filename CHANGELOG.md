@@ -8,6 +8,22 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.5.0] - 2026-07-27
+
+### Adicionado
+
+- Edição completa do cadastro diretamente pelo perfil do cliente;
+- Alteração, recorte, substituição e remoção da foto existente;
+- Exibição segura da foto armazenada no bucket privado;
+- Opção para usar o mesmo número de telefone no WhatsApp.
+- Política segura para exclusão da foto substituída no Storage da própria unidade.
+
+### Alterado
+
+- Nome completo e data de nascimento passam a ser os únicos campos obrigatórios;
+- Telefone, WhatsApp, e-mail, CPF e objetivo principal passam a ser opcionais;
+- Formulário de cliente unificado entre os fluxos de criação e edição.
+
 ## [0.4.0] - 2026-07-27
 
 ### Adicionado

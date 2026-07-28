@@ -5,6 +5,7 @@ import {
   FileClock,
   LayoutDashboard,
   LogOut,
+  MessagesSquare,
   Menu,
   PackageCheck,
   ShieldCheck,
@@ -27,6 +28,7 @@ const navigation = [
   { label: "Organizações", href: "/admin/organizacoes", icon: Building2 },
   { label: "Planos", href: "/admin/planos", icon: PackageCheck },
   { label: "Assinaturas", href: "/admin/assinaturas", icon: CreditCard },
+  { label: "Comunicação", href: "/admin/comunicacoes", icon: MessagesSquare },
   { label: "Auditoria", href: "/admin/auditoria", icon: FileClock },
 ] as const;
 

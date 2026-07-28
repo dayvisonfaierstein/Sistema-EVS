@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminPlanosRouteImport } from './routes/admin.planos'
 import { Route as AdminOrganizacoesRouteImport } from './routes/admin.organizacoes'
+import { Route as AdminComunicacoesRouteImport } from './routes/admin.comunicacoes'
 import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
 import { Route as AdminAssinaturasRouteImport } from './routes/admin.assinaturas'
 import { Route as AppVendasRouteImport } from './routes/_app/vendas'
@@ -105,6 +106,11 @@ const AdminPlanosRoute = AdminPlanosRouteImport.update({
 const AdminOrganizacoesRoute = AdminOrganizacoesRouteImport.update({
   id: '/organizacoes',
   path: '/organizacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminComunicacoesRoute = AdminComunicacoesRouteImport.update({
+  id: '/comunicacoes',
+  path: '/comunicacoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
@@ -293,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/comunicacoes': typeof AdminComunicacoesRoute
   '/admin/organizacoes': typeof AdminOrganizacoesRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin/': typeof AdminIndexRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/comunicacoes': typeof AdminComunicacoesRoute
   '/admin/organizacoes': typeof AdminOrganizacoesRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin': typeof AdminIndexRoute
@@ -379,6 +387,7 @@ export interface FileRoutesById {
   '/_app/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/comunicacoes': typeof AdminComunicacoesRoute
   '/admin/organizacoes': typeof AdminOrganizacoesRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin/': typeof AdminIndexRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/vendas'
     | '/admin/assinaturas'
     | '/admin/auditoria'
+    | '/admin/comunicacoes'
     | '/admin/organizacoes'
     | '/admin/planos'
     | '/admin/'
@@ -465,6 +475,7 @@ export interface FileRouteTypes {
     | '/vendas'
     | '/admin/assinaturas'
     | '/admin/auditoria'
+    | '/admin/comunicacoes'
     | '/admin/organizacoes'
     | '/admin/planos'
     | '/admin'
@@ -510,6 +521,7 @@ export interface FileRouteTypes {
     | '/_app/vendas'
     | '/admin/assinaturas'
     | '/admin/auditoria'
+    | '/admin/comunicacoes'
     | '/admin/organizacoes'
     | '/admin/planos'
     | '/admin/'
@@ -619,6 +631,13 @@ declare module '@tanstack/react-router' {
       path: '/organizacoes'
       fullPath: '/admin/organizacoes'
       preLoaderRoute: typeof AdminOrganizacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/comunicacoes': {
+      id: '/admin/comunicacoes'
+      path: '/comunicacoes'
+      fullPath: '/admin/comunicacoes'
+      preLoaderRoute: typeof AdminComunicacoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/auditoria': {
@@ -959,6 +978,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 interface AdminRouteChildren {
   AdminAssinaturasRoute: typeof AdminAssinaturasRoute
   AdminAuditoriaRoute: typeof AdminAuditoriaRoute
+  AdminComunicacoesRoute: typeof AdminComunicacoesRoute
   AdminOrganizacoesRoute: typeof AdminOrganizacoesRoute
   AdminPlanosRoute: typeof AdminPlanosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -967,6 +987,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAssinaturasRoute: AdminAssinaturasRoute,
   AdminAuditoriaRoute: AdminAuditoriaRoute,
+  AdminComunicacoesRoute: AdminComunicacoesRoute,
   AdminOrganizacoesRoute: AdminOrganizacoesRoute,
   AdminPlanosRoute: AdminPlanosRoute,
   AdminIndexRoute: AdminIndexRoute,

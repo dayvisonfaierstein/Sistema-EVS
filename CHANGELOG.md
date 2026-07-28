@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.20.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 5 da arquitetura SaaS com área exclusiva em `/admin`;
+- Layout e navegação próprios da administração da plataforma;
+- Dashboard global com organizações, assinaturas, receita recorrente, crescimento,
+  usuários e clientes;
+- Alertas para mensalidades vencidas, assinaturas em carência e organizações pendentes;
+- Relação global de organizações com busca e situação;
+- Gestão de planos com criação, edição, periodicidade, preço e ativação;
+- Gestão de assinaturas com criação, mudança de situação e acompanhamento;
+- Geração de mensalidades e baixa manual de pagamentos;
+- Auditoria global com identificação da organização e do responsável;
+- Redirecionamento automático do Super Admin para a central administrativa;
+- Número da versão do sistema atualizado para v0.20.0.
+
+### Segurança
+
+- A área `/admin` valida explicitamente o perfil de administrador da plataforma;
+- Usuários das organizações são direcionados para a página de acesso não autorizado;
+- Operações administrativas utilizam as funções protegidas criadas na Fase 4.
+
 ## [0.19.0] - 2026-07-28
 
 ### Adicionado

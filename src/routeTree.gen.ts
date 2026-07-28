@@ -13,8 +13,14 @@ import { Route as SemPermissaoRouteImport } from './routes/sem-permissao'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminPlanosRouteImport } from './routes/admin.planos'
+import { Route as AdminOrganizacoesRouteImport } from './routes/admin.organizacoes'
+import { Route as AdminAuditoriaRouteImport } from './routes/admin.auditoria'
+import { Route as AdminAssinaturasRouteImport } from './routes/admin.assinaturas'
 import { Route as AppVendasRouteImport } from './routes/_app/vendas'
 import { Route as AppUsuariosRouteImport } from './routes/_app/usuarios'
 import { Route as AppRelatoriosRouteImport } from './routes/_app/relatorios'
@@ -65,6 +71,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -73,6 +84,31 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlanosRoute = AdminPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrganizacoesRoute = AdminOrganizacoesRouteImport.update({
+  id: '/organizacoes',
+  path: '/organizacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditoriaRoute = AdminAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAssinaturasRoute = AdminAssinaturasRouteImport.update({
+  id: '/assinaturas',
+  path: '/assinaturas',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AppVendasRoute = AppVendasRouteImport.update({
   id: '/vendas',
@@ -223,6 +259,7 @@ const AppClientesEditarIdRoute = AppClientesEditarIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
@@ -241,6 +278,11 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/vendas': typeof AppVendasRoute
+  '/admin/assinaturas': typeof AdminAssinaturasRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/organizacoes': typeof AdminOrganizacoesRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin/': typeof AdminIndexRoute
   '/avaliacoes/$id': typeof AppAvaliacoesIdRoute
   '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
@@ -274,6 +316,11 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/vendas': typeof AppVendasRoute
+  '/admin/assinaturas': typeof AdminAssinaturasRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/organizacoes': typeof AdminOrganizacoesRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin': typeof AdminIndexRoute
   '/avaliacoes/$id': typeof AppAvaliacoesIdRoute
   '/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/clientes/$id': typeof AppClientesIdRoute
@@ -294,6 +341,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
@@ -312,6 +360,11 @@ export interface FileRoutesById {
   '/_app/relatorios': typeof AppRelatoriosRoute
   '/_app/usuarios': typeof AppUsuariosRoute
   '/_app/vendas': typeof AppVendasRoute
+  '/admin/assinaturas': typeof AdminAssinaturasRoute
+  '/admin/auditoria': typeof AdminAuditoriaRoute
+  '/admin/organizacoes': typeof AdminOrganizacoesRoute
+  '/admin/planos': typeof AdminPlanosRoute
+  '/admin/': typeof AdminIndexRoute
   '/_app/avaliacoes/$id': typeof AppAvaliacoesIdRoute
   '/_app/avaliacoes/nova': typeof AppAvaliacoesNovaRoute
   '/_app/clientes/$id': typeof AppClientesIdRoute
@@ -332,6 +385,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/login'
     | '/onboarding'
     | '/portal'
@@ -350,6 +404,11 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/admin/assinaturas'
+    | '/admin/auditoria'
+    | '/admin/organizacoes'
+    | '/admin/planos'
+    | '/admin/'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
     | '/clientes/$id'
@@ -383,6 +442,11 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/admin/assinaturas'
+    | '/admin/auditoria'
+    | '/admin/organizacoes'
+    | '/admin/planos'
+    | '/admin'
     | '/avaliacoes/$id'
     | '/avaliacoes/nova'
     | '/clientes/$id'
@@ -402,6 +466,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_app'
+    | '/admin'
     | '/login'
     | '/onboarding'
     | '/portal'
@@ -420,6 +485,11 @@ export interface FileRouteTypes {
     | '/_app/relatorios'
     | '/_app/usuarios'
     | '/_app/vendas'
+    | '/admin/assinaturas'
+    | '/admin/auditoria'
+    | '/admin/organizacoes'
+    | '/admin/planos'
+    | '/admin/'
     | '/_app/avaliacoes/$id'
     | '/_app/avaliacoes/nova'
     | '/_app/clientes/$id'
@@ -440,6 +510,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   PortalRoute: typeof PortalRoute
@@ -476,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -489,6 +567,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/planos': {
+      id: '/admin/planos'
+      path: '/planos'
+      fullPath: '/admin/planos'
+      preLoaderRoute: typeof AdminPlanosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/organizacoes': {
+      id: '/admin/organizacoes'
+      path: '/organizacoes'
+      fullPath: '/admin/organizacoes'
+      preLoaderRoute: typeof AdminOrganizacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/auditoria': {
+      id: '/admin/auditoria'
+      path: '/auditoria'
+      fullPath: '/admin/auditoria'
+      preLoaderRoute: typeof AdminAuditoriaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/assinaturas': {
+      id: '/admin/assinaturas'
+      path: '/assinaturas'
+      fullPath: '/admin/assinaturas'
+      preLoaderRoute: typeof AdminAssinaturasRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_app/vendas': {
       id: '/_app/vendas'
@@ -792,9 +905,28 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminAssinaturasRoute: typeof AdminAssinaturasRoute
+  AdminAuditoriaRoute: typeof AdminAuditoriaRoute
+  AdminOrganizacoesRoute: typeof AdminOrganizacoesRoute
+  AdminPlanosRoute: typeof AdminPlanosRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAssinaturasRoute: AdminAssinaturasRoute,
+  AdminAuditoriaRoute: AdminAuditoriaRoute,
+  AdminOrganizacoesRoute: AdminOrganizacoesRoute,
+  AdminPlanosRoute: AdminPlanosRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   PortalRoute: PortalRoute,

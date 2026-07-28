@@ -123,10 +123,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <ShieldCheck className="size-5 text-primary" />
             <span className="text-sm font-semibold">Central administrativa</span>
           </div>
-          <div className="ml-auto text-right">
-            <div className="text-sm font-semibold">{profile?.full_name ?? "Super Admin"}</div>
-            <div className="text-[11px] text-muted-foreground">Visão de toda a plataforma</div>
-          </div>
         </header>
         <main className="p-4 sm:p-6 xl:p-8">{children}</main>
       </div>

@@ -8,6 +8,12 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.6] - 2026-07-27
+
+### Removido
+
+- Card institucional “Mais saúde, mais controle, mais resultados” da página de login.
+
 ## [0.6.5] - 2026-07-27
 
 ### Corrigido

@@ -8,7 +8,6 @@ import {
   LockKeyhole,
   Mail,
   ShoppingCart,
-  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import "@/components/auth/login-page.css";
@@ -93,15 +92,6 @@ export default function LoginPage({
                 title="Controle Comercial"
                 description="Vendas, produtos, estoque e financeiro"
               />
-            </div>
-            <div className="evs-message-card">
-              <div className="evs-message-icon">
-                <ShieldCheck size={25} strokeWidth={1.8} />
-              </div>
-              <div>
-                <strong>Mais saúde, mais controle, mais resultados.</strong>
-                <span>Transforme vidas com organização e tecnologia.</span>
-              </div>
             </div>
           </div>
           <div className="evs-arc evs-arc-left" aria-hidden="true" />

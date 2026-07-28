@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
+  AlertTriangle,
   ClipboardList,
   DollarSign,
   LogIn,
@@ -47,6 +48,19 @@ function Dashboard() {
           ["Lucro estimado", brl(m?.profit ?? 0), TrendingUp],
         ] as [string, string | number, LucideIcon][])
       : []),
+    ["Valor em estoque", brl(m?.stockValue ?? 0), Package],
+    [
+      "PV em estoque",
+      new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(m?.stockPv ?? 0),
+      TrendingUp,
+    ],
+    [
+      "PV consumido no mês",
+      new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(m?.pvConsumed ?? 0),
+      Activity,
+    ],
+    ["Custo consumido no mês", brl(m?.consumptionCost ?? 0), DollarSign],
+    ["Perdas no mês", brl(m?.lossCost ?? 0), AlertTriangle],
   ];
   return (
     <div className="space-y-5">

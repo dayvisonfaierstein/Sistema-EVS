@@ -8,6 +8,25 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.14.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 8 do módulo comercial: dashboard e relatórios de estoque, consumo, custo e PV;
+- Filtros rápidos para hoje, 7 dias, 30 dias, mês atual e período personalizado;
+- Cards com posição atual do estoque, valor financeiro, PV disponível, consumo e perdas;
+- Indicadores de receita estimada, custo, lucro bruto e margem das preparações servidas;
+- Gráficos de custo, receita e PV consumido nos últimos seis meses;
+- Ranking de preparações servidas, produtos consumidos e consumo por categoria;
+- Opção para imprimir o relatório comercial diretamente pelo navegador;
+- Indicadores comerciais do mês integrados ao dashboard principal.
+
+### Alterado
+
+- Central de relatórios deixou de exibir opções demonstrativas sem funcionamento;
+- Cálculos comerciais passaram a utilizar os snapshots históricos dos consumos;
+- Número da versão do sistema atualizado para v0.14.0.
+
 ## [0.13.0] - 2026-07-28
 
 ### Adicionado

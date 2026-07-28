@@ -216,7 +216,7 @@ export default function LoginPage({
 }
 
 function Brand() {
-  return <img className="evs-logo" src="/images/logo-espaco-mais.png" alt="Espaço+" />;
+  return <img className="evs-logo" src="/images/logo-espaco-mais-v2.png" alt="Espaço+" />;
 }
 
 function Feature({

@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.2] - 2026-07-27
+
+### Alterado
+
+- Logo principal da página de login substituída pela nova versão do Espaço+;
+- Exibição da logo ampliada para 250 × 250 px no layout desktop, com redução responsiva em telas de menor altura.
+
 ## [0.6.1] - 2026-07-27
 
 ### Alterado

@@ -1,12 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, ArrowLeft, CheckCircle2, Download, ExternalLink } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  Download,
+  ExternalLink,
+  Images,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { HERBALIFE_PE_PRICE_ROWS, HERBALIFE_PE_SOURCE } from "@/data/herbalife-pe-price-list";
 import {
   analyzeHerbalifePeImport,
+  getDefaultImportCostBasis,
   importHerbalifePeProducts,
+  saveDefaultImportCostBasis,
   type HerbalifeImportPreviewRow,
   type ImportAction,
   type ImportCostBasis,
@@ -16,6 +26,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { parseProductImportFile } from "@/lib/product-import-file";
+import { createSquareProductPhoto } from "@/lib/image-processing";
+import { replaceProductPhotoBySku } from "@/services/products";
 import {
   Select,
   SelectContent,
@@ -49,6 +63,12 @@ const costLabels: Record<ImportCostBasis, string> = {
 function HerbalifePeImportPage() {
   const queryClient = useQueryClient();
   const [rows, setRows] = useState<HerbalifeImportPreviewRow[]>([]);
+  const [sourceRows, setSourceRows] = useState(HERBALIFE_PE_PRICE_ROWS);
+  const [sourceLabel, setSourceLabel] = useState("Tabela Herbalife PE incorporada");
+  const [sourceVersion, setSourceVersion] = useState(0);
+  const [referenceDate, setReferenceDate] = useState<string>(HERBALIFE_PE_SOURCE.referenceDate);
+  const [readingFile, setReadingFile] = useState(false);
+  const [photoProgress, setPhotoProgress] = useState<string | null>(null);
   const [costBasis, setCostBasis] = useState<ImportCostBasis>("price_50");
   const [lastResult, setLastResult] = useState<{
     created: number;
@@ -56,13 +76,20 @@ function HerbalifePeImportPage() {
     skipped: number;
   } | null>(null);
   const preview = useQuery({
-    queryKey: ["herbalife-pe-import-preview"],
-    queryFn: () => analyzeHerbalifePeImport(HERBALIFE_PE_PRICE_ROWS),
+    queryKey: ["herbalife-pe-import-preview", sourceVersion],
+    queryFn: () => analyzeHerbalifePeImport(sourceRows),
+  });
+  const savedCostBasis = useQuery({
+    queryKey: ["default-product-cost-basis"],
+    queryFn: getDefaultImportCostBasis,
   });
 
   useEffect(() => {
     if (preview.data) setRows(preview.data);
   }, [preview.data]);
+  useEffect(() => {
+    if (savedCostBasis.data) setCostBasis(savedCostBasis.data);
+  }, [savedCostBasis.data]);
 
   const summary = useMemo(
     () => ({
@@ -84,9 +111,78 @@ function HerbalifePeImportPage() {
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível importar a tabela."),
   });
+  const saveCostBasis = useMutation({
+    mutationFn: saveDefaultImportCostBasis,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["default-product-cost-basis"] });
+      toast.success("Faixa padrão da unidade atualizada.");
+    },
+    onError: (error) =>
+      toast.error(
+        error instanceof Error ? error.message : "Não foi possível salvar a faixa padrão.",
+      ),
+  });
 
   function setAction(sku: string, action: ImportAction) {
     setRows((current) => current.map((row) => (row.sku === sku ? { ...row, action } : row)));
+  }
+
+  async function loadImportFile(file?: File) {
+    if (!file) return;
+    setReadingFile(true);
+    setLastResult(null);
+    try {
+      const parsed = await parseProductImportFile(file, referenceDate);
+      setSourceRows(parsed);
+      setSourceLabel(file.name);
+      setSourceVersion((current) => current + 1);
+      toast.success(`${parsed.length} produto(s) lido(s) de ${file.name}.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível ler o arquivo.");
+    } finally {
+      setReadingFile(false);
+    }
+  }
+
+  async function uploadPhotos(files: FileList | null) {
+    if (!files?.length) return;
+    let success = 0;
+    const failures: string[] = [];
+    setPhotoProgress(`Preparando 1 de ${files.length}...`);
+    for (let index = 0; index < files.length; index += 1) {
+      const file = files[index];
+      const sku = file.name
+        .replace(/\.[^.]+$/, "")
+        .split(/[\s_-]/)[0]
+        .toUpperCase();
+      setPhotoProgress(`Enviando ${index + 1} de ${files.length}: SKU ${sku}`);
+      try {
+        if (!/\.(jpe?g|png|webp)$/i.test(file.name) || file.size > 10 * 1024 * 1024) {
+          throw new Error("formato ou tamanho inválido");
+        }
+        const optimized = await createSquareProductPhoto(file);
+        await replaceProductPhotoBySku(sku, optimized);
+        success += 1;
+      } catch (error) {
+        failures.push(`${sku}: ${error instanceof Error ? error.message : "falha no envio"}`);
+      }
+    }
+    setPhotoProgress(null);
+    await queryClient.invalidateQueries({ queryKey: ["products"] });
+    if (success) toast.success(`${success} foto(s) associada(s) pelo SKU.`);
+    if (failures.length)
+      toast.error(`${failures.length} arquivo(s) não importado(s): ${failures.join("; ")}`);
+  }
+
+  function downloadCsvTemplate() {
+    const content =
+      "\uFEFFSKU;Produto;PV;Valor bruto;Base de ganhos;25%;35%;42%;50%;Data de referência\r\n";
+    const url = URL.createObjectURL(new Blob([content], { type: "text/csv;charset=utf-8" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "modelo-importacao-produtos.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -126,6 +222,69 @@ function HerbalifePeImportPage() {
         </CardContent>
       </Card>
 
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="size-5 text-primary" />
+              Importar CSV ou XLSX
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Colunas: SKU, Produto, PV, Valor bruto, Base de ganhos, 25%, 35%, 42% e 50%. O arquivo
+              será comparado antes da confirmação.
+            </p>
+            <Button type="button" size="sm" variant="outline" onClick={downloadCsvTemplate}>
+              <Download />
+              Baixar modelo CSV
+            </Button>
+            <div className="grid gap-3 sm:grid-cols-[180px_1fr]">
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Data de referência
+                <Input
+                  type="date"
+                  value={referenceDate}
+                  onChange={(event) => setReferenceDate(event.target.value)}
+                />
+              </label>
+              <label className="grid gap-1 text-xs text-muted-foreground">
+                Arquivo
+                <Input
+                  type="file"
+                  accept=".csv,.xlsx"
+                  disabled={readingFile}
+                  onChange={(event) => void loadImportFile(event.target.files?.[0])}
+                />
+              </label>
+            </div>
+            <p className="text-xs font-medium text-primary">Fonte atual: {sourceLabel}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Images className="size-5 text-primary" />
+              Fotos por SKU
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Nomeie cada arquivo com o SKU, por exemplo: <strong>0951.jpg</strong>. As imagens
+              serão centralizadas, recortadas e otimizadas em 600 × 600 px.
+            </p>
+            <Input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              disabled={Boolean(photoProgress)}
+              onChange={(event) => void uploadPhotos(event.target.files)}
+            />
+            {photoProgress && <p className="text-xs font-medium text-primary">{photoProgress}</p>}
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard title="Novos" value={summary.create} tone="text-success" />
         <SummaryCard title="Atualizações" value={summary.update} tone="text-primary" />
@@ -142,7 +301,11 @@ function HerbalifePeImportPage() {
             <Label className="mb-1.5 block">Usar como custo de referência</Label>
             <Select
               value={costBasis}
-              onValueChange={(value) => setCostBasis(value as ImportCostBasis)}
+              onValueChange={(value) => {
+                const next = value as ImportCostBasis;
+                setCostBasis(next);
+                saveCostBasis.mutate(next);
+              }}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -174,20 +337,21 @@ function HerbalifePeImportPage() {
                 <TableHead>PV</TableHead>
                 <TableHead>Bruto</TableHead>
                 <TableHead>{costLabels[costBasis]}</TableHead>
+                <TableHead>Comparação anterior</TableHead>
                 <TableHead>Situação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {preview.isLoading && (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-28 text-center">
+                  <TableCell colSpan={8} className="h-28 text-center">
                     Analisando produtos...
                   </TableCell>
                 </TableRow>
               )}
               {preview.isError && (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-28 text-center text-destructive">
+                  <TableCell colSpan={8} className="h-28 text-center text-destructive">
                     Falha ao comparar a tabela com o catálogo.
                   </TableCell>
                 </TableRow>
@@ -215,6 +379,31 @@ function HerbalifePeImportPage() {
                     <TableCell>{row.volume_points.toLocaleString("pt-BR")}</TableCell>
                     <TableCell>{money.format(row.gross_price)}</TableCell>
                     <TableCell>{money.format(row[costBasis])}</TableCell>
+                    <TableCell className="text-xs">
+                      {row.previousReferenceDate ? (
+                        <>
+                          <div>
+                            PV: {row.previousPv?.toLocaleString("pt-BR") ?? "—"} →{" "}
+                            {row.volume_points.toLocaleString("pt-BR")}
+                          </div>
+                          <div className="text-muted-foreground">
+                            Bruto:{" "}
+                            {row.previousGrossPrice === null
+                              ? "—"
+                              : money.format(row.previousGrossPrice)}{" "}
+                            → {money.format(row.gross_price)}
+                          </div>
+                          <div className="text-muted-foreground">
+                            Ref.{" "}
+                            {new Date(`${row.previousReferenceDate}T12:00:00`).toLocaleDateString(
+                              "pt-BR",
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        "Sem histórico"
+                      )}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge row={row} />
                     </TableCell>

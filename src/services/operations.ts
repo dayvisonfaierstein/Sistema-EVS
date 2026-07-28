@@ -1,5 +1,13 @@
 import { getSupabase } from "@/integrations/supabase/client";
-import type { Access, Assessment } from "@/types/database";
+import type { Access, AccessConsumption, Assessment, ConsumptionItem } from "@/types/database";
+
+export type ClientConsumptionHistory = AccessConsumption & {
+  accesses: { accessed_at: string; service_performed: string | null } | null;
+  consumption_items: Pick<
+    ConsumptionItem,
+    "id" | "product_name_snapshot" | "quantity" | "unit" | "cost_total" | "pv_total"
+  >[];
+};
 
 export async function listTodayAccesses() {
   const start = new Date();
@@ -36,6 +44,18 @@ export async function registerAccess(input: {
   });
   if (error) throw error;
   return data;
+}
+
+export async function listClientConsumptions(clientId: string) {
+  const { data, error } = await getSupabase()
+    .from("access_consumptions")
+    .select(
+      "*, accesses(accessed_at,service_performed), consumption_items(id,product_name_snapshot,quantity,unit,cost_total,pv_total)",
+    )
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ClientConsumptionHistory[];
 }
 
 export async function listAssessments(clientId?: string) {

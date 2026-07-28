@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   CalendarDays,
   ClipboardList,
+  ChefHat,
   FileText,
   Pencil,
   Phone,
@@ -22,10 +23,11 @@ import { AssessmentCharts } from "@/components/assessments/AssessmentCharts";
 import { AssessmentSummaryCards } from "@/components/assessments/AssessmentSummaryCards";
 import { ExperiencePlansPanel } from "@/components/clients/ExperiencePlansPanel";
 import { ClientReferralsPanel } from "@/components/clients/ClientReferralsPanel";
+import { listClientConsumptions } from "@/services/operations";
 
 const searchSchema = z.object({
   tab: z
-    .enum(["overview", "evolution", "assessments", "experience", "referrals"])
+    .enum(["overview", "evolution", "assessments", "consumption", "experience", "referrals"])
     .optional()
     .catch("overview"),
 });
@@ -49,6 +51,10 @@ function ClientProfile() {
   const assessments = useQuery({
     queryKey: ["assessments", id],
     queryFn: () => listAssessments(id),
+  });
+  const consumptions = useQuery({
+    queryKey: ["client-consumptions", id],
+    queryFn: () => listClientConsumptions(id),
   });
   if (client.isLoading)
     return <p className="text-sm text-muted-foreground">Carregando perfil...</p>;
@@ -117,6 +123,10 @@ function ClientProfile() {
           <TabsTrigger value="overview">Visão geral</TabsTrigger>
           <TabsTrigger value="evolution">Evolução</TabsTrigger>
           <TabsTrigger value="assessments">Avaliações</TabsTrigger>
+          <TabsTrigger value="consumption" className="gap-1">
+            <ChefHat className="size-3.5" />
+            Consumos
+          </TabsTrigger>
           <TabsTrigger value="experience" className="gap-1">
             <CalendarDays className="size-3.5" />
             Experiência de 3 dias
@@ -202,6 +212,68 @@ function ClientProfile() {
                     </Link>
                   </Button>
                 </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="consumption">
+          <Card>
+            <CardHeader>
+              <CardTitle>Histórico de consumo</CardTitle>
+            </CardHeader>
+            <CardContent className="divide-y">
+              {consumptions.isLoading && (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  Carregando consumos...
+                </p>
+              )}
+              {(consumptions.data ?? []).map((consumption) => (
+                <article
+                  key={consumption.id}
+                  className="grid gap-3 py-4 md:grid-cols-[150px_1fr_auto] md:items-start"
+                >
+                  <div className="text-sm">
+                    <strong className="block">
+                      {new Date(
+                        consumption.accesses?.accessed_at ?? consumption.created_at,
+                      ).toLocaleDateString("pt-BR")}
+                    </strong>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(
+                        consumption.accesses?.accessed_at ?? consumption.created_at,
+                      ).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-medium">
+                      {consumption.item_name_snapshot} ×{" "}
+                      {consumption.quantity.toLocaleString("pt-BR")}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {consumption.consumption_items
+                        .map(
+                          (item) =>
+                            `${item.product_name_snapshot}: ${item.quantity.toLocaleString("pt-BR")} ${item.unit}`,
+                        )
+                        .join(" • ")}
+                    </p>
+                  </div>
+                  <div className="text-right text-sm">
+                    <strong>{consumption.pv_total.toLocaleString("pt-BR")} PV</strong>
+                    <p className="text-xs text-muted-foreground">
+                      Custo:{" "}
+                      {new Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(consumption.cost_total)}
+                    </p>
+                  </div>
+                </article>
+              ))}
+              {!consumptions.isLoading && !consumptions.data?.length && (
+                <p className="py-10 text-center text-sm text-muted-foreground">
+                  Nenhum consumo registrado para este cliente.
+                </p>
               )}
             </CardContent>
           </Card>

@@ -132,6 +132,28 @@ async function uploadProductPhoto(organizationId: string, productId: string, pho
   return path;
 }
 
+export async function replaceProductPhotoBySku(sku: string, photo: File) {
+  const supabase = getSupabase();
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("id,organization_id,photo_url")
+    .ilike("sku", sku.trim())
+    .single();
+  if (error) throw new Error(`Produto com SKU ${sku} não encontrado.`);
+  const path = await uploadProductPhoto(product.organization_id, product.id, photo);
+  const { error: updateError } = await supabase
+    .from("products")
+    .update({ photo_url: path })
+    .eq("id", product.id);
+  if (updateError) {
+    await supabase.storage.from("product-images").remove([path]);
+    throw updateError;
+  }
+  if (product.photo_url && product.photo_url !== path) {
+    await supabase.storage.from("product-images").remove([product.photo_url]);
+  }
+}
+
 export async function createProduct(input: ProductInput, photo?: File | null) {
   const organizationId = await getOrganizationId();
   const supabase = getSupabase();

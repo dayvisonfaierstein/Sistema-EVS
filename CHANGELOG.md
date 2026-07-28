@@ -8,6 +8,32 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.15.0] - 2026-07-28
+
+### Adicionado
+
+- Consolidação das fases 0 a 8 do módulo comercial;
+- Auditoria automática para categorias, produtos, lotes, movimentações, receitas, ingredientes e consumos;
+- Importação de novas tabelas de produtos pelos formatos CSV e XLSX;
+- Modelo CSV disponível para download na própria tela de importação;
+- Validação das colunas, valores, SKUs obrigatórios e registros duplicados nos arquivos;
+- Comparação de PV e preço bruto com a última referência já armazenada;
+- Faixa de custo padrão configurável e persistida por unidade;
+- Envio em lote das fotos dos produtos com associação pelo SKU do nome do arquivo;
+- Recorte central e otimização automática das fotos importadas em lote;
+- Disponibilidade de porções calculada a partir do ingrediente com menor estoque;
+- Nova aba de histórico de consumo no perfil do cliente, com ingredientes, custo e PV.
+
+### Segurança
+
+- Saídas manuais de consumo, venda, perda, vencimento e ajuste negativo passaram a consumir lotes por FEFO;
+- Registros de auditoria preservam usuário, data, entidade, dados anteriores e dados novos;
+- Importações continuam exigindo revisão e confirmação antes de alterar produtos existentes.
+
+### Alterado
+
+- Número da versão do sistema atualizado para v0.15.0.
+
 ## [0.14.0] - 2026-07-28
 
 ### Adicionado

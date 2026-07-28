@@ -13,6 +13,8 @@ export type RecipeItemWithProduct = RecipeItem & {
     | "volume_points"
     | "average_cost"
     | "cost_price"
+    | "current_stock"
+    | "active"
   > | null;
 };
 
@@ -38,7 +40,7 @@ async function getOrganizationId() {
 }
 
 const recipeSelect =
-  "*, recipe_items(*, products(id,name,sku,photo_url,package_content,consumption_unit,volume_points,average_cost,cost_price))";
+  "*, recipe_items(*, products(id,name,sku,photo_url,package_content,consumption_unit,volume_points,average_cost,cost_price,current_stock,active))";
 
 export async function listRecipes() {
   const { data, error } = await getSupabase()
@@ -162,4 +164,13 @@ export function recipeTotals(recipe: Pick<RecipeWithItems, "sale_price" | "recip
   const profit = recipe.sale_price - cost;
   const margin = recipe.sale_price > 0 ? (profit / recipe.sale_price) * 100 : 0;
   return { cost, pv, profit, margin };
+}
+
+export function recipeAvailability(recipe: Pick<RecipeWithItems, "recipe_items">) {
+  if (!recipe.recipe_items.length) return 0;
+  return recipe.recipe_items.reduce((available, item) => {
+    const product = item.products;
+    if (!product?.active || item.quantity <= 0) return 0;
+    return Math.min(available, Math.floor(product.current_stock / item.quantity));
+  }, Number.POSITIVE_INFINITY);
 }

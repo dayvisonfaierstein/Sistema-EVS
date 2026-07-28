@@ -7,7 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getRecipePhotoUrls, listRecipes, recipeTotals } from "@/services/recipes";
+import {
+  getRecipePhotoUrls,
+  listRecipes,
+  recipeAvailability,
+  recipeTotals,
+} from "@/services/recipes";
 
 export const Route = createFileRoute("/_app/receitas/")({
   head: () => ({ meta: [{ title: "Receitas e preparações — Espaço+" }] }),
@@ -78,6 +83,7 @@ function RecipesPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((recipe) => {
           const totals = recipeTotals(recipe);
+          const available = recipeAvailability(recipe);
           const photoUrl = recipe.photo_url ? photos.data?.[recipe.photo_url] : null;
           return (
             <Card key={recipe.id} className="overflow-hidden">
@@ -106,6 +112,10 @@ function RecipesPage() {
                   <Metric label="Custo" value={money.format(totals.cost)} />
                   <Metric label="PV" value={number.format(totals.pv)} />
                   <Metric label="Margem" value={`${number.format(totals.margin)}%`} />
+                  <Metric
+                    label="Disponibilidade"
+                    value={available > 0 ? `${available} porção(ões)` : "Sem estoque"}
+                  />
                 </div>
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/receitas/editar/$id" params={{ id: recipe.id }}>

@@ -46,3 +46,18 @@ export async function createCroppedProfilePhoto(file: File, crop: Area) {
     lastModified: Date.now(),
   });
 }
+
+export async function createSquareProductPhoto(file: File) {
+  const image = await decodeImage(file);
+  const width = image.width;
+  const height = image.height;
+  const size = Math.min(width, height);
+  const crop = {
+    x: Math.max(0, (width - size) / 2),
+    y: Math.max(0, (height - size) / 2),
+    width: size,
+    height: size,
+  };
+  if ("close" in image) image.close();
+  return createCroppedProfilePhoto(file, crop);
+}

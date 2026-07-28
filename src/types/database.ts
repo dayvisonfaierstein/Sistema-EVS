@@ -17,6 +17,59 @@ export type Profile = {
   avatar_url: string | null;
   role: UserRole;
   active: boolean;
+  is_platform_admin: boolean;
+  is_organization_admin: boolean;
+  first_access: boolean;
+  job_title: string | null;
+  access_template: string | null;
+  last_access_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrganizationStatus =
+  | "pending"
+  | "trial"
+  | "active"
+  | "grace_period"
+  | "blocked"
+  | "cancelled"
+  | "inactive";
+
+export type Organization = {
+  id: string;
+  legal_name: string;
+  trade_name: string;
+  document: string | null;
+  legal_document_type: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  address: string | null;
+  address_number: string | null;
+  address_complement: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
+  postal_code: string | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  responsible_name: string | null;
+  responsible_phone: string | null;
+  responsible_whatsapp: string | null;
+  responsible_email: string | null;
+  status: OrganizationStatus;
+  onboarding_completed: boolean;
+  onboarding_completed_at: string | null;
+  subscription_status: string;
+  active: boolean;
+  blocked_at: string | null;
+  blocked_reason: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type Client = {

@@ -8,6 +8,31 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.18.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 1 da arquitetura SaaS multiempresa;
+- Estados, onboarding e dados cadastrais ampliados para organizações;
+- Identificação de administrador da plataforma, administrador da organização e
+  primeiro acesso nos perfis;
+- Funções seguras `is_super_admin()`, `is_organization_admin()`,
+  `current_organization_id()`, `has_permission()` e
+  `can_access_organization()`;
+- Barreira RLS restritiva para impedir acesso cruzado entre organizações;
+- Proteção de campos administrativos sensíveis em organizações e perfis;
+- Contexto de autenticação compatível com as novas flags administrativas;
+- Tipos TypeScript para organizações e identidade SaaS;
+- Documentação de aplicação e compatibilidade da migration.
+
+### Segurança
+
+- Removida a execução autenticada do antigo autocadastro de organizações;
+- Corrigida a política ampla de escrita em perfis;
+- Preservadas as políticas funcionais existentes sob uma barreira obrigatória de
+  isolamento multiempresa;
+- Número da versão do sistema atualizado para v0.18.0.
+
 ## [0.17.1] - 2026-07-28
 
 ### Documentação

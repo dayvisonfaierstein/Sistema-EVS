@@ -70,7 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       can(...roles) {
         return Boolean(
           profile &&
-          (profile.role === "super_admin" ||
+          (profile.is_platform_admin ||
+            profile.is_organization_admin ||
+            profile.role === "super_admin" ||
             profile.role === "administrator" ||
             roles.includes(profile.role)),
         );

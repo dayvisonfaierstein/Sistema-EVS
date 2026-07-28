@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSupabase } from "@/integrations/supabase/client";
 import { createSquareProductPhoto } from "@/lib/image-processing";
@@ -117,6 +118,8 @@ function FirstAccess() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
 
   const isOrganizationAdmin = Boolean(
     profile?.is_organization_admin || profile?.role === "administrator",
@@ -233,28 +236,38 @@ function FirstAccess() {
     if (password !== passwordConfirmation) return "As senhas não são iguais.";
     if (!confirmed) return "Confirme que os dados informados estão corretos.";
     if (!isOrganizationAdmin) return null;
-    if (
-      organization.legal_name.trim().length < 2 ||
-      organization.trade_name.trim().length < 2 ||
-      organization.address.trim().length < 3 ||
-      organization.city.trim().length < 2 ||
-      organization.state.trim().length !== 2 ||
-      organization.responsible_name.trim().length < 3
-    )
-      return "Preencha todos os campos obrigatórios do Espaço.";
+    if (organization.trade_name.trim().length < 2) return "Informe o nome fantasia do Espaço.";
+    if (organization.legal_name.trim().length < 2) return "Informe a razão social do Espaço.";
+    if (organization.address.trim().length < 3) return "Informe o endereço do Espaço.";
+    if (organization.city.trim().length < 2) return "Informe a cidade do Espaço.";
+    if (organization.state.trim().length !== 2) return "Informe a UF com duas letras.";
+    if (organization.responsible_name.trim().length < 3)
+      return "Informe o nome do responsável pelo Espaço.";
     return null;
   }
 
   async function complete() {
+    setFormError(null);
     const validationError = validate();
-    if (validationError) return toast.error(validationError);
+    if (validationError) {
+      setFormError(validationError);
+      toast.error(validationError);
+      document.getElementById("onboarding-error")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
 
     setSaving(true);
     let uploadedLogoPath: string | null = null;
     try {
       const supabase = getSupabase();
-      const { error: passwordError } = await supabase.auth.updateUser({ password });
-      if (passwordError) throw passwordError;
+      if (!passwordUpdated) {
+        const { error: passwordError } = await supabase.auth.updateUser({ password });
+        if (passwordError) throw passwordError;
+        setPasswordUpdated(true);
+      }
 
       let logoPath = organization.logo_url;
       if (logoFile && profile?.organization_id) {
@@ -308,9 +321,14 @@ function FirstAccess() {
       if (uploadedLogoPath) {
         await getSupabase().storage.from("organization-logos").remove([uploadedLogoPath]);
       }
-      toast.error(
-        error instanceof Error ? error.message : "Não foi possível concluir o primeiro acesso.",
-      );
+      const message =
+        error instanceof Error ? error.message : "Não foi possível concluir o primeiro acesso.";
+      setFormError(message);
+      toast.error(message);
+      document.getElementById("onboarding-error")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     } finally {
       setSaving(false);
     }
@@ -338,6 +356,7 @@ function FirstAccess() {
 
   return (
     <div className="min-h-screen bg-muted/30 p-4 sm:p-8">
+      <Toaster richColors position="top-right" />
       <Card className="mx-auto w-full max-w-5xl">
         <CardHeader className="border-b">
           <div className="mb-2 grid size-12 place-items-center rounded-xl bg-primary-soft text-primary">
@@ -552,6 +571,16 @@ function FirstAccess() {
               Após esta etapa, o ambiente será liberado automaticamente quando a assinatura estiver
               ativa ou em período de teste.
             </p>
+          )}
+
+          {formError && (
+            <div
+              id="onboarding-error"
+              role="alert"
+              className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm font-medium text-destructive"
+            >
+              {formError}
+            </div>
           )}
 
           <Button

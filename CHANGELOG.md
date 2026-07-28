@@ -8,6 +8,18 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.9.1] - 2026-07-27
+
+### Removido
+
+- Módulo e item de navegação “Fornecedores”, pois o abastecimento do Espaço+ é realizado exclusivamente pela Herbalife.
+
+### Alterado
+
+- Marca dos produtos fixada como `Herbalife` no cadastro e na gravação;
+- Filtro de marcas removido do catálogo por não ser necessário;
+- Número da versão do sistema atualizado para `v0.9.1`.
+
 ## [0.9.0] - 2026-07-27
 
 ### Adicionado

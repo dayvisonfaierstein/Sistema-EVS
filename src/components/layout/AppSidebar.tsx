@@ -9,7 +9,6 @@ import {
   Package,
   Wallet,
   Box,
-  Truck,
   PartyPopper,
   Megaphone,
   FileBarChart,
@@ -43,7 +42,6 @@ const comercial = [
   { title: "Produtos", url: "/produtos", icon: Package },
   { title: "Estoque", url: "/estoque", icon: Box },
   { title: "Financeiro", url: "/financeiro", icon: Wallet },
-  { title: "Fornecedores", url: "/fornecedores", icon: Truck },
 ];
 const engajamento = [
   { title: "Eventos", url: "/eventos", icon: PartyPopper },

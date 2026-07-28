@@ -43,7 +43,6 @@ function EditProductPage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["product", id] }),
         queryClient.invalidateQueries({ queryKey: ["products"] }),
-        queryClient.invalidateQueries({ queryKey: ["product-brands"] }),
       ]);
       toast.success("Produto atualizado com sucesso.");
       await navigate({ to: "/produtos/$id", params: { id } });

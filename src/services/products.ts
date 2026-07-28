@@ -4,7 +4,6 @@ import type { Product, ProductCategory, ProductVerificationStatus } from "@/type
 export type ProductFilters = {
   search?: string;
   categoryId?: string;
-  brand?: string;
   active?: "all" | "active" | "inactive";
   stock?: "all" | "in_stock" | "low" | "out";
 };
@@ -82,7 +81,6 @@ export async function listProducts(filters: ProductFilters = {}) {
   const search = filters.search?.trim();
   if (search) query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
   if (filters.categoryId) query = query.eq("category_id", filters.categoryId);
-  if (filters.brand) query = query.eq("brand", filters.brand);
   if (filters.active === "active") query = query.eq("active", true);
   if (filters.active === "inactive") query = query.eq("active", false);
 
@@ -106,16 +104,6 @@ export async function listProducts(filters: ProductFilters = {}) {
   }
 
   return products;
-}
-
-export async function listProductBrands() {
-  const { data, error } = await getSupabase()
-    .from("products")
-    .select("brand")
-    .not("brand", "is", null)
-    .order("brand");
-  if (error) throw error;
-  return [...new Set((data ?? []).map((item) => item.brand).filter(Boolean))] as string[];
 }
 
 export async function getProduct(id: string) {
@@ -155,7 +143,7 @@ export async function createProduct(input: ProductInput, photo?: File | null) {
       unit: input.consumption_unit,
       sku: input.sku?.trim() || null,
       name: input.name.trim(),
-      brand: input.brand?.trim() || null,
+      brand: "Herbalife",
       pv_last_updated_at: input.volume_points === null ? null : new Date().toISOString(),
     })
     .select()
@@ -205,7 +193,7 @@ export async function updateProduct(
       unit: input.consumption_unit,
       sku: input.sku?.trim() || null,
       name: input.name.trim(),
-      brand: input.brand?.trim() || null,
+      brand: "Herbalife",
       ...(newPhotoPath !== undefined ? { photo_url: newPhotoPath } : {}),
     })
     .eq("id", id)

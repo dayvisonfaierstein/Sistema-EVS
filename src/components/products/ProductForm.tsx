@@ -230,7 +230,15 @@ export function ProductForm({
           </div>
           {field("sku", "SKU", { placeholder: "Ex.: 0951 ou 059K" })}
           {field("barcode", "Código de barras")}
-          {field("brand", "Marca")}
+          <div>
+            <Label htmlFor="brand" className="mb-1.5 block">
+              Marca
+            </Label>
+            <Input id="brand" value="Herbalife" readOnly className="bg-muted/40" />
+            <p className="mt-1 text-xs text-muted-foreground">
+              O catálogo do Espaço+ utiliza exclusivamente produtos Herbalife.
+            </p>
+          </div>
           {field("subcategory", "Subcategoria")}
           <div className="md:col-span-2">
             <div className="mb-1.5 flex items-center justify-between gap-2">

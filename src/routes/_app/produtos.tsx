@@ -23,7 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  listProductBrands,
   listProductCategories,
   getProductPhotoUrls,
   listProducts,
@@ -66,7 +65,6 @@ function ProductsPage() {
     queryKey: ["product-categories", "active"],
     queryFn: () => listProductCategories(),
   });
-  const brands = useQuery({ queryKey: ["product-brands"], queryFn: listProductBrands });
   const setFilter = <K extends keyof ProductFilters>(key: K, value: ProductFilters[K]) =>
     setFilters((current) => ({ ...current, [key]: value }));
 
@@ -89,7 +87,7 @@ function ProductsPage() {
         }
       />
       <Card>
-        <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-5">
+        <CardContent className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="relative md:col-span-2">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -105,14 +103,6 @@ function ProductsPage() {
             options={[
               ["all", "Todas as categorias"],
               ...(categories.data ?? []).map((item) => [item.id, item.name] as const),
-            ]}
-          />
-          <FilterSelect
-            value={filters.brand ?? "all"}
-            onChange={(value) => setFilter("brand", value === "all" ? undefined : value)}
-            options={[
-              ["all", "Todas as marcas"],
-              ...(brands.data ?? []).map((brand) => [brand, brand] as const),
             ]}
           />
           <div className="grid grid-cols-2 gap-3">

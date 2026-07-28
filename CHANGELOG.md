@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.12.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 6 do módulo comercial: Receitas e Preparações;
+- Relação visual de preparações com foto, categoria, preço, custo, PV e margem;
+- Cadastro e edição de preparações com múltiplos ingredientes;
+- Quantidade de consumo individual para cada produto da receita;
+- Cálculo automático do custo proporcional, PV total, lucro bruto e margem;
+- Inclusão, recorte, substituição e remoção da foto da preparação;
+- Salvamento transacional da receita e de todos os seus ingredientes;
+- Nova opção Receitas no menu Comercial.
+
+### Segurança
+
+- Cadastro e edição de preparações restritos aos perfis autorizados;
+- Produtos inativos ou de outra organização não podem ser vinculados às receitas.
+
+### Alterado
+
+- Editor de fotos reutilizado para manter o mesmo padrão visual de produtos e preparações;
+- Número da versão do sistema atualizado para v0.12.0.
+
 ## [0.11.2] - 2026-07-28
 
 ### Adicionado

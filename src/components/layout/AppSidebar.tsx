@@ -14,6 +14,7 @@ import {
   FileBarChart,
   Shield,
   Settings,
+  CookingPot,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,6 +42,7 @@ const comercial = [
   { title: "Vendas (PDV)", url: "/vendas", icon: ShoppingCart },
   { title: "Produtos", url: "/produtos", icon: Package },
   { title: "Estoque", url: "/estoque", icon: Box },
+  { title: "Receitas", url: "/receitas", icon: CookingPot },
   { title: "Financeiro", url: "/financeiro", icon: Wallet },
 ];
 const engajamento = [

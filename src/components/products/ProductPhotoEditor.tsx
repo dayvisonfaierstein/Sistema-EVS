@@ -22,11 +22,13 @@ export function ProductPhotoEditor({
   existingUrl,
   onChange,
   onRemove,
+  entityLabel = "produto",
 }: {
   value: File | null;
   existingUrl?: string | null;
   onChange: (file: File | null) => void;
   onRemove?: () => void;
+  entityLabel?: string;
 }) {
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -36,6 +38,7 @@ export function ProductPhotoEditor({
   const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [processing, setProcessing] = useState(false);
+  const entityWithArticle = entityLabel === "produto" ? "do produto" : `da ${entityLabel}`;
 
   useEffect(() => {
     if (!value) return setPreviewUrl("");
@@ -71,7 +74,7 @@ export function ProductPhotoEditor({
       onChange(await createCroppedProfilePhoto(sourceFile, croppedArea));
       setOpen(false);
       setSourceFile(null);
-      toast.success("Foto do produto recortada e otimizada.");
+      toast.success(`Foto ${entityWithArticle} recortada e otimizada.`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível processar a foto.");
     } finally {
@@ -92,7 +95,7 @@ export function ProductPhotoEditor({
           {previewUrl || existingUrl ? (
             <img
               src={previewUrl || existingUrl || ""}
-              alt="Prévia do produto"
+              alt={`Prévia ${entityWithArticle}`}
               className="size-full object-contain"
             />
           ) : (
@@ -138,7 +141,7 @@ export function ProductPhotoEditor({
       <Dialog open={open} onOpenChange={(next) => !next && cancel()}>
         <DialogContent className="max-h-[96vh] max-w-2xl overflow-y-auto sm:rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Ajustar foto do produto</DialogTitle>
+            <DialogTitle>Ajustar foto {entityWithArticle}</DialogTitle>
             <DialogDescription>
               Centralize a embalagem na área quadrada e ajuste o zoom antes de salvar.
             </DialogDescription>

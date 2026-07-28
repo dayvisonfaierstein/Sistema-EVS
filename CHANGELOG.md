@@ -8,6 +8,28 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.16.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 9 do módulo comercial: controle de perdas e desperdícios;
+- Atalho “Registrar perda” na página de estoque;
+- Motivos padronizados: vencimento, derramamento, erro de preparo, embalagem danificada, ajuste de estoque e outro;
+- Estimativa de custo e PV perdidos antes da confirmação;
+- Snapshots históricos do custo unitário, custo total e PV total em cada perda;
+- Identificação visual do impacto financeiro e de PV no histórico de movimentações;
+- Relatório de perdas por período e motivo com quantidade, lançamentos, custo e PV.
+
+### Segurança
+
+- Custo e PV das perdas ficam preservados mesmo após alterações futuras no cadastro do produto;
+- Perdas continuam utilizando baixa transacional, bloqueio de estoque negativo, auditoria e consumo FEFO dos lotes.
+
+### Alterado
+
+- Dashboard e relatório comercial passaram a utilizar os valores históricos armazenados nas perdas;
+- Número da versão do sistema atualizado para v0.16.0.
+
 ## [0.15.0] - 2026-07-28
 
 ### Adicionado

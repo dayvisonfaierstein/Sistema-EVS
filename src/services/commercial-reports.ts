@@ -37,6 +37,9 @@ type MovementRow = {
   product_id: string;
   movement_type: string;
   quantity: number;
+  loss_reason: string | null;
+  cost_total: number | null;
+  pv_total: number | null;
   created_at: string;
 };
 
@@ -70,6 +73,13 @@ export type CommercialReport = {
   }>;
   topProducts: Array<{ name: string; quantity: number; cost: number; pv: number }>;
   categories: Array<{ name: string; quantity: number; cost: number; pv: number }>;
+  losses: Array<{
+    reason: string;
+    entries: number;
+    quantity: number;
+    cost: number;
+    pv: number;
+  }>;
 };
 
 const number = (value: unknown) => Number(value ?? 0);
@@ -112,8 +122,8 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
         .lt("created_at", end),
       db
         .from("inventory_movements")
-        .select("product_id,movement_type,quantity,created_at")
-        .in("movement_type", ["loss", "expiration"])
+        .select("product_id,movement_type,quantity,loss_reason,cost_total,pv_total,created_at")
+        .not("loss_reason", "is", null)
         .gte("created_at", start)
         .lt("created_at", end),
       db
@@ -178,15 +188,23 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
   period.profit = period.revenue - period.cost;
   period.margin = period.revenue > 0 ? (period.profit / period.revenue) * 100 : 0;
 
+  const lossMap = new Map<string, CommercialReport["losses"][number]>();
   movements.forEach((movement) => {
-    const product = productMap.get(movement.product_id);
-    if (!product) return;
-    const quantity = number(movement.quantity);
-    period.lossCost += quantity * number(product.average_cost);
-    const packageContent = number(product.package_content);
-    if (packageContent > 0) {
-      period.lossPv += quantity * (number(product.volume_points) / packageContent);
-    }
+    const reason = movement.loss_reason ?? "other";
+    const current = lossMap.get(reason) ?? {
+      reason,
+      entries: 0,
+      quantity: 0,
+      cost: 0,
+      pv: 0,
+    };
+    current.entries += 1;
+    current.quantity += number(movement.quantity);
+    current.cost += number(movement.cost_total);
+    current.pv += number(movement.pv_total);
+    period.lossCost += number(movement.cost_total);
+    period.lossPv += number(movement.pv_total);
+    lossMap.set(reason, current);
   });
 
   const preparationMap = new Map<string, CommercialReport["topPreparations"][number]>();
@@ -274,5 +292,6 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 8),
     categories: [...categoryMap.values()].sort((a, b) => b.cost - a.cost),
+    losses: [...lossMap.values()].sort((a, b) => b.cost - a.cost),
   };
 }

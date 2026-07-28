@@ -253,6 +253,17 @@ export type InventoryMovement = {
   previous_balance: number;
   new_balance: number;
   reason: string | null;
+  loss_reason:
+    | "expiration"
+    | "spill"
+    | "preparation_error"
+    | "damaged_package"
+    | "stock_adjustment"
+    | "other"
+    | null;
+  unit_cost_snapshot: number | null;
+  cost_total: number | null;
+  pv_total: number | null;
   notes: string | null;
   reference_type: string | null;
   reference_id: string | null;

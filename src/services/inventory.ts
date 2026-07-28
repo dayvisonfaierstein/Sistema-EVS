@@ -11,6 +11,17 @@ export type InventoryMovementType =
   | "expiration"
   | "negative_adjustment";
 
+export const lossReasonLabels = {
+  expiration: "Vencimento",
+  spill: "Derramamento",
+  preparation_error: "Erro de preparo",
+  damaged_package: "Embalagem danificada",
+  stock_adjustment: "Ajuste de estoque",
+  other: "Outro",
+} as const;
+
+export type LossReason = keyof typeof lossReasonLabels;
+
 export type InventoryMovementInput = {
   productId: string;
   movementType: InventoryMovementType;

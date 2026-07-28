@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCommercialReport } from "@/services/commercial-reports";
+import { lossReasonLabels, type LossReason } from "@/services/inventory";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/relatorios")({
@@ -302,6 +303,45 @@ function CommercialReports() {
                     <TableRow>
                       <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                         Nenhum consumo registrado no período.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Perdas e desperdícios por motivo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Motivo</TableHead>
+                    <TableHead className="text-right">Lançamentos</TableHead>
+                    <TableHead className="text-right">Quantidade</TableHead>
+                    <TableHead className="text-right">Custo perdido</TableHead>
+                    <TableHead className="text-right">PV perdido</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.losses.map((loss) => (
+                    <TableRow key={loss.reason}>
+                      <TableCell className="font-medium">
+                        {lossReasonLabels[loss.reason as LossReason] ?? "Outro"}
+                      </TableCell>
+                      <TableCell className="text-right">{loss.entries}</TableCell>
+                      <TableCell className="text-right">{decimal.format(loss.quantity)}</TableCell>
+                      <TableCell className="text-right">{currency.format(loss.cost)}</TableCell>
+                      <TableCell className="text-right">{decimal.format(loss.pv)}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!data.losses.length && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                        Nenhuma perda registrada no período.
                       </TableCell>
                     </TableRow>
                   )}

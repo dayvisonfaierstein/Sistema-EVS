@@ -56,14 +56,13 @@ export async function getDashboardMetrics() {
       .gte("created_at", month.toISOString()),
     db
       .from("inventory_movements")
-      .select("product_id,quantity")
-      .in("movement_type", ["loss", "expiration"])
+      .select("cost_total,pv_total")
+      .not("loss_reason", "is", null)
       .gte("created_at", month.toISOString()),
   ]);
   const revenue = (income.data ?? []).reduce((s, x) => s + Number(x.amount), 0),
     expense = (expenses.data ?? []).reduce((s, x) => s + Number(x.amount), 0);
   const products = lowStock.data ?? [];
-  const productMap = new Map(products.map((product) => [product.id, product]));
   const pvConsumed = (consumptions.data ?? []).reduce(
     (sum, item) => sum + Number(item.pv_total),
     0,
@@ -72,10 +71,10 @@ export async function getDashboardMetrics() {
     (sum, item) => sum + Number(item.cost_total),
     0,
   );
-  const lossCost = (losses.data ?? []).reduce((sum, movement) => {
-    const product = productMap.get(movement.product_id);
-    return sum + Number(movement.quantity) * Number(product?.average_cost ?? 0);
-  }, 0);
+  const lossCost = (losses.data ?? []).reduce(
+    (sum, movement) => sum + Number(movement.cost_total ?? 0),
+    0,
+  );
   const stockValue = products.reduce(
     (sum, product) => sum + Number(product.current_stock) * Number(product.average_cost),
     0,

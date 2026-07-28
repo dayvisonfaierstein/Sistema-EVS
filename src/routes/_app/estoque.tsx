@@ -47,9 +47,11 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   listExpiringBatches,
   listInventoryMovements,
+  lossReasonLabels,
   registerInventoryMovement,
   type InventoryMovementInput,
   type InventoryMovementType,
+  type LossReason,
 } from "@/services/inventory";
 import { getProductPhotoUrls, listProducts } from "@/services/products";
 
@@ -118,6 +120,11 @@ function InventoryPage() {
   });
   const selectedProduct = products.data?.find((product) => product.id === form.productId);
   const selectedMovement = movementLabels[form.movementType];
+  const isWasteMovement = ["loss", "expiration", "negative_adjustment"].includes(form.movementType);
+  const selectedLossReason =
+    (Object.entries(lossReasonLabels) as Array<[LossReason, string]>).find(
+      ([, label]) => label === form.reason,
+    )?.[0] ?? "";
   const canManageInventory = can("manager", "inventory");
 
   const stats = useMemo(() => {
@@ -147,9 +154,12 @@ function InventoryPage() {
         (movement) =>
           movementLabels[movement.movement_type as InventoryMovementType]?.direction === "exit",
       ).length,
-      losses: monthMovements.filter((movement) =>
-        ["loss", "expiration"].includes(movement.movement_type),
-      ).length,
+      losses: monthMovements.filter((movement) => movement.loss_reason).length,
+      lossCost: monthMovements.reduce(
+        (total, movement) => total + Number(movement.cost_total ?? 0),
+        0,
+      ),
+      lossPv: monthMovements.reduce((total, movement) => total + Number(movement.pv_total ?? 0), 0),
     };
   }, [movements.data, products.data]);
 
@@ -179,7 +189,14 @@ function InventoryPage() {
     setForm((current) => ({
       ...current,
       movementType: value,
-      reason: label,
+      reason:
+        value === "expiration"
+          ? lossReasonLabels.expiration
+          : value === "negative_adjustment"
+            ? lossReasonLabels.stock_adjustment
+            : value === "loss"
+              ? ""
+              : label,
       unitCost: value === "purchase" ? current.unitCost : null,
     }));
   };
@@ -200,6 +217,17 @@ function InventoryPage() {
     saveMovement.mutate(form);
   };
 
+  const openLossDialog = () => {
+    setForm({
+      ...initialForm,
+      movementType: "loss",
+      quantityMode: "consumption",
+      reason: "",
+      unitCost: null,
+    });
+    setDialogOpen(true);
+  };
+
   return (
     <div className="space-y-5">
       <PageHeader
@@ -207,10 +235,21 @@ function InventoryPage() {
         description="Entradas, saídas, perdas, lotes e histórico completo."
         actions={
           canManageInventory ? (
-            <Button onClick={() => setDialogOpen(true)}>
-              <Plus />
-              Nova movimentação
-            </Button>
+            <>
+              <Button variant="outline" onClick={openLossDialog}>
+                <Scale />
+                Registrar perda
+              </Button>
+              <Button
+                onClick={() => {
+                  setForm(initialForm);
+                  setDialogOpen(true);
+                }}
+              >
+                <Plus />
+                Nova movimentação
+              </Button>
+            </>
           ) : undefined
         }
       />
@@ -244,8 +283,8 @@ function InventoryPage() {
         />
         <StatCard
           title="Perdas no mês"
-          value={stats.losses}
-          hint="perdas e vencimentos"
+          value={money.format(stats.lossCost)}
+          hint={`${stats.losses} lançamento(s) • ${number.format(stats.lossPv)} PV`}
           icon={Scale}
           tone="destructive"
         />
@@ -344,6 +383,12 @@ function InventoryPage() {
                     </TableCell>
                     <TableCell>
                       <div>{movement.reason || "—"}</div>
+                      {movement.loss_reason && (
+                        <div className="text-xs font-medium text-destructive">
+                          {money.format(Number(movement.cost_total ?? 0))} •{" "}
+                          {number.format(Number(movement.pv_total ?? 0))} PV perdidos
+                        </div>
+                      )}
                       {movement.notes && (
                         <div className="max-w-64 truncate text-xs text-muted-foreground">
                           {movement.notes}
@@ -445,12 +490,35 @@ function InventoryPage() {
                 />
               </Field>
 
-              <Field label="Motivo">
-                <Input
-                  value={form.reason}
-                  onChange={(event) => setField("reason", event.target.value)}
-                  placeholder="Ex.: compra mensal"
-                />
+              <Field label={isWasteMovement ? "Motivo da perda" : "Motivo"}>
+                {form.movementType === "loss" ? (
+                  <Select
+                    value={selectedLossReason}
+                    onValueChange={(value) =>
+                      setField("reason", lossReasonLabels[value as LossReason])
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o motivo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.entries(lossReasonLabels) as Array<[LossReason, string]>)
+                        .filter(([value]) => value !== "expiration")
+                        .map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={form.reason}
+                    onChange={(event) => setField("reason", event.target.value)}
+                    placeholder="Ex.: compra mensal"
+                    readOnly={form.movementType === "expiration"}
+                  />
+                )}
               </Field>
 
               {selectedProduct && (
@@ -470,6 +538,33 @@ function InventoryPage() {
                         {selectedProduct.consumption_unit}
                       </span>
                     )}
+                  </div>
+                </div>
+              )}
+              {selectedProduct && isWasteMovement && (
+                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-3 text-sm sm:col-span-2">
+                  <strong>Impacto estimado desta perda</strong>
+                  <div className="mt-1 flex flex-wrap gap-x-6 gap-y-1 text-muted-foreground">
+                    <span>
+                      Custo:{" "}
+                      {money.format(
+                        (form.quantityMode === "package" && selectedProduct.package_content
+                          ? form.quantity * selectedProduct.package_content
+                          : form.quantity) * selectedProduct.average_cost,
+                      )}
+                    </span>
+                    <span>
+                      PV:{" "}
+                      {number.format(
+                        selectedProduct.package_content
+                          ? (form.quantityMode === "package"
+                              ? form.quantity * selectedProduct.package_content
+                              : form.quantity) *
+                              ((selectedProduct.volume_points ?? 0) /
+                                selectedProduct.package_content)
+                          : 0,
+                      )}
+                    </span>
                   </div>
                 </div>
               )}

@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.11.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 5 do módulo comercial: entrada e movimentação real de estoque;
+- Registro de compras, devoluções, consumos, vendas, perdas, vencimentos e ajustes;
+- Conversão automática de embalagens para a unidade de consumo do produto;
+- Histórico completo com data, produto, quantidade, motivo, responsável e saldo;
+- Cadastro opcional de lote, fabricação, validade e custo na entrada;
+- Cálculo de custo médio ponderado nas entradas com custo informado;
+- Cards reais de valor em estoque, estoque baixo, produtos sem estoque e movimentações do mês;
+- Controle transacional no Supabase para impedir estoque negativo e atualizações parciais.
+
+### Segurança
+
+- Alterações diretas no saldo do produto são bloqueadas pelo banco;
+- Somente administradores, gestores e responsáveis pelo estoque podem registrar movimentações.
+
+### Alterado
+
+- Tela de Estoque deixou de usar dados demonstrativos;
+- Número da versão do sistema atualizado para v0.11.0.
+
 ## [0.10.2] - 2026-07-28
 
 ### Adicionado

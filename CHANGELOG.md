@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.19.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 4 da arquitetura SaaS com planos comerciais da plataforma;
+- Assinaturas vinculadas às organizações com histórico e preço contratado preservado;
+- Mensalidades com vencimento, baixa manual, comprovante, forma de pagamento e
+  referência;
+- Estados pendente, ativo, vencido, carência, bloqueado e cancelado;
+- Funções seguras para criar assinaturas, gerar mensalidades, registrar pagamentos,
+  alterar situação e atualizar vencimentos;
+- Campos preparados para integração futura com gateway, sem ativar cobrança externa;
+- Auditoria de alterações em planos, assinaturas e mensalidades;
+- Tipos TypeScript para todo o domínio de assinaturas;
+- Número da versão do sistema atualizado para v0.19.0.
+
+### Segurança
+
+- Gestão de planos e cobrança restrita ao Super Admin;
+- Organizações consultam somente a própria assinatura e apenas com a permissão
+  `settings.subscription.view`;
+- Campos legados de assinatura permanecem sincronizados para preservar compatibilidade.
+
 ## [0.18.2] - 2026-07-28
 
 ### Adicionado

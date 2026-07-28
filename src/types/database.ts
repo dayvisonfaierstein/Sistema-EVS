@@ -72,6 +72,99 @@ export type Organization = {
   updated_at: string;
 };
 
+export type PlanBillingInterval = "monthly" | "quarterly" | "semiannual" | "annual";
+
+export type SubscriptionStatus =
+  | "pending"
+  | "active"
+  | "overdue"
+  | "grace_period"
+  | "blocked"
+  | "cancelled";
+
+export type SubscriptionPaymentStatus = "pending" | "paid" | "overdue" | "cancelled" | "refunded";
+
+export type Plan = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  billing_interval: PlanBillingInterval;
+  interval_count: number;
+  trial_days: number;
+  grace_days: number;
+  features: string[];
+  limits: Record<string, unknown>;
+  gateway_provider: string | null;
+  gateway_plan_id: string | null;
+  metadata: Record<string, unknown>;
+  active: boolean;
+  sort_order: number;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Subscription = {
+  id: string;
+  organization_id: string;
+  plan_id: string;
+  status: SubscriptionStatus;
+  starts_on: string;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  next_due_date: string | null;
+  due_day: number;
+  grace_until: string | null;
+  cancelled_at: string | null;
+  blocked_at: string | null;
+  ended_at: string | null;
+  price_snapshot: number;
+  currency: string;
+  billing_interval: PlanBillingInterval;
+  interval_count: number;
+  manual_billing: boolean;
+  auto_renew: boolean;
+  gateway_provider: string | null;
+  gateway_customer_id: string | null;
+  gateway_subscription_id: string | null;
+  metadata: Record<string, unknown>;
+  notes: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SubscriptionPayment = {
+  id: string;
+  organization_id: string;
+  subscription_id: string;
+  reference_period_start: string;
+  reference_period_end: string;
+  due_date: string;
+  amount: number;
+  currency: string;
+  status: SubscriptionPaymentStatus;
+  paid_at: string | null;
+  paid_amount: number | null;
+  payment_method: string | null;
+  payment_reference: string | null;
+  receipt_url: string | null;
+  gateway_provider: string | null;
+  gateway_payment_id: string | null;
+  gateway_payload: Record<string, unknown>;
+  notes: string | null;
+  recorded_by: string | null;
+  cancelled_at: string | null;
+  cancelled_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Permission = {
   id: string;
   key: string;

@@ -70,15 +70,15 @@
 
 .evs-logo {
   display: block;
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   max-width: 100%;
   object-fit: contain;
   object-position: left center;
 }
 
 .evs-headline {
-  margin-top: clamp(8px, 1.5vh, 18px);
+  margin-top: clamp(18px, 2.5vh, 28px);
 }
 
 .evs-headline h1 {
@@ -577,13 +577,13 @@
   }
 
   .evs-logo {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     max-width: 100%;
   }
 
   .evs-headline {
-    margin-top: 12px;
+    margin-top: 22px;
   }
 
   .evs-headline h1 {
@@ -674,13 +674,13 @@
   }
 
   .evs-logo {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     max-width: 100%;
   }
 
   .evs-headline {
-    margin-top: 8px;
+    margin-top: 18px;
   }
 
   .evs-headline h1 {

@@ -128,9 +128,26 @@ export async function getProduct(id: string) {
   return data as Product;
 }
 
-export async function createProduct(input: ProductInput) {
+function validateProductPhoto(photo: File) {
+  if (photo.type !== "image/jpeg" || photo.size > 2 * 1024 * 1024) {
+    throw new Error("A foto processada é inválida ou excede 2 MB.");
+  }
+}
+
+async function uploadProductPhoto(organizationId: string, productId: string, photo: File) {
+  validateProductPhoto(photo);
+  const path = `${organizationId}/${productId}/${crypto.randomUUID()}.jpg`;
+  const { error } = await getSupabase()
+    .storage.from("product-images")
+    .upload(path, photo, { contentType: "image/jpeg", cacheControl: "31536000" });
+  if (error) throw error;
+  return path;
+}
+
+export async function createProduct(input: ProductInput, photo?: File | null) {
   const organizationId = await getOrganizationId();
-  const { data, error } = await getSupabase()
+  const supabase = getSupabase();
+  const { data, error } = await supabase
     .from("products")
     .insert({
       ...input,
@@ -144,11 +161,44 @@ export async function createProduct(input: ProductInput) {
     .select()
     .single();
   if (error) throw error;
+  if (photo) {
+    const photoPath = await uploadProductPhoto(organizationId, data.id, photo);
+    const { data: updated, error: photoError } = await supabase
+      .from("products")
+      .update({ photo_url: photoPath })
+      .eq("id", data.id)
+      .select()
+      .single();
+    if (photoError) {
+      await supabase.storage.from("product-images").remove([photoPath]);
+      throw photoError;
+    }
+    return updated as Product;
+  }
   return data as Product;
 }
 
-export async function updateProduct(id: string, input: ProductInput) {
-  const { data, error } = await getSupabase()
+export async function updateProduct(
+  id: string,
+  input: ProductInput,
+  options?: { photo?: File | null; removePhoto?: boolean; currentPhotoPath?: string | null },
+) {
+  const supabase = getSupabase();
+  const { data: current, error: currentError } = await supabase
+    .from("products")
+    .select("organization_id, photo_url")
+    .eq("id", id)
+    .single();
+  if (currentError) throw currentError;
+
+  let newPhotoPath: string | null | undefined;
+  if (options?.photo) {
+    newPhotoPath = await uploadProductPhoto(current.organization_id, id, options.photo);
+  } else if (options?.removePhoto) {
+    newPhotoPath = null;
+  }
+
+  const { data, error } = await supabase
     .from("products")
     .update({
       ...input,
@@ -156,10 +206,41 @@ export async function updateProduct(id: string, input: ProductInput) {
       sku: input.sku?.trim() || null,
       name: input.name.trim(),
       brand: input.brand?.trim() || null,
+      ...(newPhotoPath !== undefined ? { photo_url: newPhotoPath } : {}),
     })
     .eq("id", id)
     .select()
     .single();
-  if (error) throw error;
+  if (error) {
+    if (newPhotoPath) await supabase.storage.from("product-images").remove([newPhotoPath]);
+    throw error;
+  }
+  const oldPhotoPath = options?.currentPhotoPath ?? current.photo_url;
+  if (oldPhotoPath && newPhotoPath !== undefined && oldPhotoPath !== newPhotoPath) {
+    await supabase.storage.from("product-images").remove([oldPhotoPath]);
+  }
   return data as Product;
+}
+
+export async function getProductPhotoUrl(path?: string | null) {
+  if (!path) return null;
+  const { data, error } = await getSupabase()
+    .storage.from("product-images")
+    .createSignedUrl(path, 60 * 60);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+export async function getProductPhotoUrls(paths: Array<string | null>) {
+  const uniquePaths = [...new Set(paths.filter((path): path is string => Boolean(path)))];
+  if (!uniquePaths.length) return {} as Record<string, string>;
+  const { data, error } = await getSupabase()
+    .storage.from("product-images")
+    .createSignedUrls(uniquePaths, 60 * 60);
+  if (error) throw error;
+  return Object.fromEntries(
+    (data ?? [])
+      .filter((item) => item.signedUrl)
+      .map((item, index) => [uniquePaths[index], item.signedUrl]),
+  ) as Record<string, string>;
 }

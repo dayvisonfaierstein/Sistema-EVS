@@ -17,9 +17,9 @@ export const Route = createFileRoute("/_app/produtos/novo")({
 function NewProductPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  async function submit(values: ProductFormValues) {
+  async function submit(values: ProductFormValues, photo: File | null) {
     try {
-      const product = await createProduct(productFormValuesToInput(values));
+      const product = await createProduct(productFormValuesToInput(values), photo);
       await queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Produto cadastrado com sucesso.");
       await navigate({ to: "/produtos/$id", params: { id: product.id } });

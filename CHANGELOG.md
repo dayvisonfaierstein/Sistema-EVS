@@ -8,6 +8,21 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.9.0] - 2026-07-27
+
+### Adicionado
+
+- Envio de fotos no cadastro e na edição de produtos;
+- Editor de imagem com recorte quadrado, reposicionamento e controle de zoom;
+- Otimização automática das fotos para 600 × 600 px em JPEG;
+- Exibição segura das imagens no catálogo e na página de detalhes;
+- Substituição e remoção de fotos existentes.
+
+### Segurança
+
+- Fotos armazenadas no bucket privado `product-images`, separadas por organização;
+- URLs temporárias assinadas para impedir acesso público direto aos arquivos.
+
 ## [0.8.0] - 2026-07-27
 
 ### Adicionado

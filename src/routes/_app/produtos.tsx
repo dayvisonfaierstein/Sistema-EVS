@@ -25,6 +25,7 @@ import {
 import {
   listProductBrands,
   listProductCategories,
+  getProductPhotoUrls,
   listProducts,
   type ProductFilters,
 } from "@/services/products";
@@ -55,6 +56,11 @@ function ProductsPage() {
   const products = useQuery({
     queryKey: ["products", filters],
     queryFn: () => listProducts(filters),
+  });
+  const photos = useQuery({
+    queryKey: ["product-photos", products.data?.map((product) => product.photo_url)],
+    queryFn: () => getProductPhotoUrls((products.data ?? []).map((product) => product.photo_url)),
+    enabled: Boolean(products.data?.some((product) => product.photo_url)),
   });
   const categories = useQuery({
     queryKey: ["product-categories", "active"],
@@ -170,10 +176,10 @@ function ProductsPage() {
                         className="flex items-center gap-3 hover:text-primary"
                       >
                         <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-lg bg-primary-soft text-primary">
-                          {product.photo_url ? (
+                          {product.photo_url && photos.data?.[product.photo_url] ? (
                             <img
-                              src={product.photo_url}
-                              alt=""
+                              src={photos.data[product.photo_url]}
+                              alt={product.name}
                               className="size-full object-contain"
                             />
                           ) : (

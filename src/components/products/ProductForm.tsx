@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ProductPhotoEditor } from "@/components/products/ProductPhotoEditor";
 
 const decimalText = z
   .string()
@@ -143,13 +144,21 @@ function initialValues(product?: Product): ProductFormValues {
 
 export function ProductForm({
   product,
+  existingPhotoUrl,
   submitLabel,
   onSubmit,
 }: {
   product?: Product;
+  existingPhotoUrl?: string | null;
   submitLabel: string;
-  onSubmit: (values: ProductFormValues) => Promise<void>;
+  onSubmit: (
+    values: ProductFormValues,
+    photo: File | null,
+    removeExistingPhoto: boolean,
+  ) => Promise<void>;
 }) {
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [removeExistingPhoto, setRemoveExistingPhoto] = useState(false);
   const categories = useQuery({
     queryKey: ["product-categories", "active"],
     queryFn: () => listProductCategories(),
@@ -188,7 +197,29 @@ export function ProductForm({
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={handleSubmit((values) => onSubmit(values, photo, removeExistingPhoto))}
+      className="space-y-5"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>Foto do produto</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProductPhotoEditor
+            value={photo}
+            existingUrl={removeExistingPhoto ? null : existingPhotoUrl}
+            onChange={(file) => {
+              setPhoto(file);
+              if (file) setRemoveExistingPhoto(false);
+            }}
+            onRemove={() => {
+              setPhoto(null);
+              setRemoveExistingPhoto(Boolean(existingPhotoUrl));
+            }}
+          />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Identificação</CardTitle>

@@ -8,7 +8,7 @@ import {
   productFormValuesToInput,
   type ProductFormValues,
 } from "@/components/products/ProductForm";
-import { getProduct, updateProduct } from "@/services/products";
+import { getProduct, getProductPhotoUrl, updateProduct } from "@/services/products";
 
 export const Route = createFileRoute("/_app/produtos/editar/$id")({
   head: () => ({ meta: [{ title: "Editar produto — Espaço+" }] }),
@@ -20,13 +20,26 @@ function EditProductPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const product = useQuery({ queryKey: ["product", id], queryFn: () => getProduct(id) });
+  const photo = useQuery({
+    queryKey: ["product-photo", product.data?.photo_url],
+    queryFn: () => getProductPhotoUrl(product.data?.photo_url),
+    enabled: Boolean(product.data?.photo_url),
+  });
   if (product.isLoading)
     return <p className="text-sm text-muted-foreground">Carregando produto...</p>;
   if (!product.data) return <p className="text-sm text-destructive">Produto não encontrado.</p>;
 
-  async function submit(values: ProductFormValues) {
+  async function submit(
+    values: ProductFormValues,
+    newPhoto: File | null,
+    removeExistingPhoto: boolean,
+  ) {
     try {
-      await updateProduct(id, productFormValuesToInput(values));
+      await updateProduct(id, productFormValuesToInput(values), {
+        photo: newPhoto,
+        removePhoto: removeExistingPhoto,
+        currentPhotoPath: product.data?.photo_url,
+      });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["product", id] }),
         queryClient.invalidateQueries({ queryKey: ["products"] }),
@@ -53,7 +66,12 @@ function EditProductPage() {
         title={`Editar ${product.data.name}`}
         description="Atualize o cadastro sem alterar o saldo atual do estoque."
       />
-      <ProductForm product={product.data} submitLabel="Salvar alterações" onSubmit={submit} />
+      <ProductForm
+        product={product.data}
+        existingPhotoUrl={photo.data}
+        submitLabel="Salvar alterações"
+        onSubmit={submit}
+      />
     </div>
   );
 }

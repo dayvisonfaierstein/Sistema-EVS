@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/layout/PageChrome";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getProduct } from "@/services/products";
+import { getProduct, getProductPhotoUrl } from "@/services/products";
 
 export const Route = createFileRoute("/_app/produtos/$id")({
   head: () => ({ meta: [{ title: "Detalhes do produto — Espaço+" }] }),
@@ -17,6 +17,11 @@ const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL
 function ProductDetailPage() {
   const { id } = Route.useParams();
   const product = useQuery({ queryKey: ["product", id], queryFn: () => getProduct(id) });
+  const photo = useQuery({
+    queryKey: ["product-photo", product.data?.photo_url],
+    queryFn: () => getProductPhotoUrl(product.data?.photo_url),
+    enabled: Boolean(product.data?.photo_url),
+  });
   if (product.isLoading)
     return <p className="text-sm text-muted-foreground">Carregando produto...</p>;
   if (!product.data) return <p className="text-sm text-destructive">Produto não encontrado.</p>;
@@ -48,6 +53,16 @@ function ProductDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
+            <div className="grid min-h-64 place-items-center overflow-hidden rounded-xl border bg-muted/20 p-5">
+              {photo.data ? (
+                <img src={photo.data} alt={p.name} className="max-h-80 w-full object-contain" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <Package className="size-16 opacity-35" />
+                  <span className="text-sm">Produto sem foto</span>
+                </div>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2">
               <Badge variant={p.active ? "default" : "outline"}>
                 {p.active ? "Ativo" : "Inativo"}

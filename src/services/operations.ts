@@ -6,7 +6,9 @@ export async function listTodayAccesses() {
   start.setHours(0, 0, 0, 0);
   const { data, error } = await getSupabase()
     .from("accesses")
-    .select("*, clients(full_name, photo_url)")
+    .select(
+      "*, clients(full_name, photo_url), access_consumptions(id,item_name_snapshot,quantity,cost_total,pv_total,consumption_type)",
+    )
     .gte("accessed_at", start.toISOString())
     .order("accessed_at", { ascending: false })
     .limit(50);
@@ -19,12 +21,18 @@ export async function registerAccess(input: {
   access_type: string;
   service_performed?: string;
   notes?: string;
+  consumption_type?: "none" | "recipe" | "product";
+  item_id?: string | null;
+  quantity?: number;
 }) {
-  const { data, error } = await getSupabase().rpc("register_client_access", {
+  const { data, error } = await getSupabase().rpc("register_access_with_consumption", {
     p_client_id: input.client_id,
     p_access_type: input.access_type,
     p_service_performed: input.service_performed,
     p_notes: input.notes,
+    p_consumption_type: input.consumption_type ?? "none",
+    p_item_id: input.item_id ?? null,
+    p_quantity: input.quantity ?? 1,
   });
   if (error) throw error;
   return data;

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Clock, Search } from "lucide-react";
+import { Check, ChefHat, Clock, Package, Search } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageChrome";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getClientPhotoUrls, listClients } from "@/services/clients";
+import { getProductPhotoUrls, listProducts } from "@/services/products";
+import { getRecipePhotoUrls, listRecipes } from "@/services/recipes";
 import { listTodayAccesses, registerAccess } from "@/services/operations";
 import { toast } from "sonner";
 
@@ -24,12 +26,21 @@ function Accesses() {
   const [selected, setSelected] = useState("");
   const [service, setService] = useState("");
   const [notes, setNotes] = useState("");
+  const [consumptionType, setConsumptionType] = useState<"none" | "recipe" | "product">("none");
+  const [consumptionId, setConsumptionId] = useState("");
+  const [consumptionQuantity, setConsumptionQuantity] = useState(1);
+  const [consumptionSearch, setConsumptionSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const clients = useQuery({
     queryKey: ["access-clients", search],
     queryFn: () => listClients(search, 0, 10),
   });
   const accesses = useQuery({ queryKey: ["today-accesses"], queryFn: listTodayAccesses });
+  const recipes = useQuery({ queryKey: ["recipes"], queryFn: listRecipes });
+  const products = useQuery({
+    queryKey: ["products", { active: "active" }],
+    queryFn: () => listProducts({ active: "active" }),
+  });
   const photoPaths = [
     ...(clients.data?.clients.map((client) => client.photo_url) ?? []),
     ...(accesses.data?.map((access) => access.clients?.photo_url ?? null) ?? []),
@@ -39,9 +50,36 @@ function Accesses() {
     queryFn: () => getClientPhotoUrls(photoPaths),
     enabled: photoPaths.some(Boolean),
   });
+  const recipePhotos = useQuery({
+    queryKey: ["access-recipe-photos", recipes.data?.map((recipe) => recipe.photo_url)],
+    queryFn: () => getRecipePhotoUrls((recipes.data ?? []).map((recipe) => recipe.photo_url)),
+    enabled: Boolean(recipes.data?.some((recipe) => recipe.photo_url)),
+  });
+  const productPhotos = useQuery({
+    queryKey: ["access-product-photos", products.data?.map((product) => product.photo_url)],
+    queryFn: () => getProductPhotoUrls((products.data ?? []).map((product) => product.photo_url)),
+    enabled: Boolean(products.data?.some((product) => product.photo_url)),
+  });
   const current = clients.data?.clients.find((c) => c.id === selected);
+  const consumptionOptions =
+    consumptionType === "recipe"
+      ? (recipes.data ?? []).filter((recipe) => recipe.active)
+      : consumptionType === "product"
+        ? (products.data ?? [])
+        : [];
+  const filteredConsumptionOptions = consumptionOptions.filter((item) =>
+    item.name.toLocaleLowerCase("pt-BR").includes(consumptionSearch.toLocaleLowerCase("pt-BR")),
+  );
+  const selectedConsumption = consumptionOptions.find((item) => item.id === consumptionId);
   async function confirm() {
     if (!selected) return toast.error("Selecione um cliente.");
+    if (consumptionType !== "none" && !consumptionId)
+      return toast.error("Selecione o consumo realizado.");
+    if (
+      consumptionType !== "none" &&
+      (!Number.isFinite(consumptionQuantity) || consumptionQuantity <= 0)
+    )
+      return toast.error("Informe uma quantidade válida.");
     setSaving(true);
     try {
       await registerAccess({
@@ -49,11 +87,20 @@ function Accesses() {
         access_type: "visit",
         service_performed: service,
         notes,
+        consumption_type: consumptionType,
+        item_id: consumptionId || null,
+        quantity: consumptionQuantity,
       });
       toast.success(`Acesso registrado para ${current?.full_name}.`);
       setService("");
       setNotes("");
+      setConsumptionType("none");
+      setConsumptionId("");
+      setConsumptionQuantity(1);
+      setConsumptionSearch("");
       await qc.invalidateQueries({ queryKey: ["today-accesses"] });
+      await qc.invalidateQueries({ queryKey: ["products"] });
+      await qc.invalidateQueries({ queryKey: ["inventory-movements"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Falha ao registrar acesso.");
     } finally {
@@ -129,6 +176,130 @@ function Accesses() {
               <Label className="mb-1.5 block">Observações</Label>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
             </div>
+            <div className="space-y-3 rounded-xl border p-4">
+              <div>
+                <Label className="mb-2 block">Consumo realizado</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ["none", "Sem consumo"],
+                      ["recipe", "Preparação"],
+                      ["product", "Produto avulso"],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <Button
+                      key={value}
+                      type="button"
+                      size="sm"
+                      variant={consumptionType === value ? "default" : "outline"}
+                      onClick={() => {
+                        setConsumptionType(value);
+                        setConsumptionId("");
+                        setConsumptionQuantity(1);
+                        setConsumptionSearch("");
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {consumptionType !== "none" && (
+                <>
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={consumptionSearch}
+                      onChange={(event) => setConsumptionSearch(event.target.value)}
+                      placeholder={
+                        consumptionType === "recipe" ? "Buscar preparação..." : "Buscar produto..."
+                      }
+                      className="pl-9"
+                    />
+                  </div>
+                  <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
+                    {filteredConsumptionOptions.map((item) => {
+                      const imagePath = item.photo_url;
+                      const imageUrl =
+                        consumptionType === "recipe"
+                          ? imagePath
+                            ? recipePhotos.data?.[imagePath]
+                            : undefined
+                          : imagePath
+                            ? productPhotos.data?.[imagePath]
+                            : undefined;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setConsumptionId(item.id)}
+                          className={`flex w-full items-center gap-3 rounded-lg border p-2 text-left ${
+                            consumptionId === item.id
+                              ? "border-primary bg-primary-soft"
+                              : "hover:bg-accent"
+                          }`}
+                        >
+                          <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-lg bg-primary-soft text-primary">
+                            {imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={item.name}
+                                className="size-full object-cover"
+                              />
+                            ) : consumptionType === "recipe" ? (
+                              <ChefHat className="size-5" />
+                            ) : (
+                              <Package className="size-5" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate font-medium">{item.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {consumptionType === "recipe"
+                                ? "Preparação"
+                                : "current_stock" in item
+                                  ? `${item.current_stock.toLocaleString("pt-BR")} ${item.consumption_unit} disponível`
+                                  : "Produto"}
+                            </div>
+                          </div>
+                          {consumptionId === item.id && <Check className="size-4 text-primary" />}
+                        </button>
+                      );
+                    })}
+                    {!filteredConsumptionOptions.length && (
+                      <p className="py-4 text-center text-sm text-muted-foreground">
+                        Nenhuma opção encontrada.
+                      </p>
+                    )}
+                  </div>
+                  {selectedConsumption && (
+                    <div className="grid grid-cols-[1fr_120px] items-end gap-3 rounded-lg bg-muted/40 p-3">
+                      <div>
+                        <div className="text-xs text-muted-foreground">Selecionado</div>
+                        <div className="font-medium">{selectedConsumption.name}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1 block text-xs">
+                          {consumptionType === "recipe"
+                            ? "Porções"
+                            : "consumption_unit" in selectedConsumption
+                              ? `Quantidade (${selectedConsumption.consumption_unit})`
+                              : "Quantidade"}
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0.000001"
+                          step="any"
+                          value={consumptionQuantity}
+                          onChange={(event) => setConsumptionQuantity(Number(event.target.value))}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
             <Button size="lg" className="w-full" disabled={!selected || saving} onClick={confirm}>
               <Check />
               {saving ? "Registrando..." : "Confirmar acesso"}
@@ -155,6 +326,12 @@ function Accesses() {
                 <div className="text-xs text-muted-foreground">
                   {a.service_performed || "Visita"}
                 </div>
+                {a.access_consumptions?.map((consumption) => (
+                  <div key={consumption.id} className="mt-1 text-xs font-medium text-primary">
+                    {consumption.item_name_snapshot} ×{" "}
+                    {consumption.quantity.toLocaleString("pt-BR")}
+                  </div>
+                ))}
               </div>
               <Badge variant="outline">
                 <Clock className="mr-1 size-3" />

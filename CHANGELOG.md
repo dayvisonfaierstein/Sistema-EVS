@@ -8,6 +8,31 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.13.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 7 do módulo comercial: integração do consumo ao acesso do cliente;
+- Seleção visual de preparação ou produto avulso durante o registro do acesso;
+- Fotos das preparações e dos produtos para facilitar a identificação;
+- Quantidade de porções ou unidades consumidas;
+- Baixa automática de todos os ingredientes da preparação;
+- Consumo dos lotes pela ordem de validade mais próxima (FEFO);
+- Registro histórico do custo e dos Pontos de Volume consumidos;
+- Exibição do consumo realizado nos últimos acessos do dia;
+- Mensagem detalhada quando o estoque de um ingrediente é insuficiente.
+
+### Segurança
+
+- Acesso, consumo, itens e movimentações são registrados em uma única transação;
+- Em caso de falha, nenhuma baixa parcial é mantida;
+- Valores de custo, PV e nome dos produtos são preservados como snapshot histórico.
+
+### Alterado
+
+- Registro de acesso passou a atualizar também estoque e histórico de consumo;
+- Número da versão do sistema atualizado para v0.13.0.
+
 ## [0.12.0] - 2026-07-28
 
 ### Adicionado

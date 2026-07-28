@@ -135,6 +135,12 @@ export type Access = {
   notes: string | null;
   created_at: string;
   clients?: Pick<Client, "full_name" | "photo_url">;
+  access_consumptions?: Array<
+    Pick<
+      AccessConsumption,
+      "id" | "item_name_snapshot" | "quantity" | "cost_total" | "pv_total" | "consumption_type"
+    >
+  >;
 };
 
 export type ProductCategory = {

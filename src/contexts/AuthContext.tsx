@@ -6,12 +6,14 @@ import type { Profile, UserRole } from "@/types/database";
 type AuthValue = {
   session: Session | null;
   profile: Profile | null;
+  permissions: string[];
   loading: boolean;
   configured: boolean;
   signIn(email: string, password: string): Promise<void>;
   resetPassword(email: string): Promise<void>;
   signOut(): Promise<void>;
   can(...roles: UserRole[]): boolean;
+  hasPermission(permission: string): boolean;
 };
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -20,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(configured);
 
   useEffect(() => {
@@ -29,11 +32,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(next);
       if (!next) {
         setProfile(null);
+        setPermissions([]);
         setLoading(false);
         return;
       }
-      const { data } = await supabase.from("profiles").select("*").eq("id", next.user.id).single();
+      const [{ data }, permissionResult] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", next.user.id).single(),
+        supabase.rpc("get_my_permissions"),
+      ]);
       setProfile(data as Profile | null);
+      setPermissions(
+        (permissionResult.data ?? []).map(
+          (item: { permission_key: string }) => item.permission_key,
+        ),
+      );
       if (data?.active) {
         await supabase
           .from("profiles")
@@ -51,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       session,
       profile,
+      permissions,
       loading,
       configured,
       async signIn(email, password) {
@@ -77,8 +90,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             roles.includes(profile.role)),
         );
       },
+      hasPermission(permission) {
+        return Boolean(
+          profile &&
+          (profile.is_platform_admin ||
+            profile.is_organization_admin ||
+            profile.role === "super_admin" ||
+            profile.role === "administrator" ||
+            permissions.includes(permission)),
+        );
+      },
     }),
-    [configured, loading, profile, session],
+    [configured, loading, permissions, profile, session],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

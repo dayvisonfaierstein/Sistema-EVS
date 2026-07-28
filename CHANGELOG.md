@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.18.1] - 2026-07-28
+
+### Adicionado
+
+- Fase 2 da arquitetura SaaS com permissões granulares;
+- Catálogo de permissões para todos os módulos atuais;
+- Modelos Administrador, Comercial, Atendimento, Avaliação, Estoque, Financeiro e
+  Personalizado;
+- Permissões financeiras específicas para receitas, despesas, pagamentos, caixa,
+  lucro e exportação;
+- Funções seguras para consultar, aplicar e substituir permissões;
+- Auditoria automática de concessões, alterações e remoções;
+- Carregamento das permissões no contexto de autenticação;
+- Tipos TypeScript para permissões, modelos e vínculos de usuários.
+
+### Segurança
+
+- Escrita direta em permissões de usuários bloqueada por RLS;
+- Alterações restritas ao Super Admin ou administrador da mesma organização;
+- Administrador principal mantido com acesso total implícito;
+- Usuários existentes migrados para modelos equivalentes sem perda de acesso;
+- Número da versão do sistema atualizado para v0.18.1.
+
 ## [0.18.0] - 2026-07-28
 
 ### Adicionado

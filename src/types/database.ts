@@ -72,6 +72,48 @@ export type Organization = {
   updated_at: string;
 };
 
+export type Permission = {
+  id: string;
+  key: string;
+  module: string;
+  name: string;
+  description: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AccessTemplateKey =
+  | "administrator"
+  | "commercial"
+  | "service"
+  | "assessment"
+  | "inventory"
+  | "finance"
+  | "custom";
+
+export type AccessTemplate = {
+  id: string;
+  key: AccessTemplateKey;
+  name: string;
+  description: string | null;
+  is_system: boolean;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserPermission = {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  permission_id: string;
+  granted: boolean;
+  granted_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Client = {
   id: string;
   organization_id: string;

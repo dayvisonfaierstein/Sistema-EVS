@@ -8,6 +8,12 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.5] - 2026-07-27
+
+### Corrigido
+
+- Regras responsivas da página de login corrigidas para manter a logo em 200 × 200 px nas resoluções desktop com menor altura.
+
 ## [0.6.4] - 2026-07-27
 
 ### Alterado

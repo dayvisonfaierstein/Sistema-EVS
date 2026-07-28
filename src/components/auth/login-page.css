@@ -577,12 +577,13 @@
   }
 
   .evs-logo {
-    width: min(168px, 60%);
-    height: 104px;
+    width: 200px;
+    height: 200px;
+    max-width: 100%;
   }
 
   .evs-headline {
-    margin-top: 18px;
+    margin-top: 12px;
   }
 
   .evs-headline h1 {
@@ -673,12 +674,13 @@
   }
 
   .evs-logo {
-    width: min(150px, 56%);
-    height: 88px;
+    width: 200px;
+    height: 200px;
+    max-width: 100%;
   }
 
   .evs-headline {
-    margin-top: 10px;
+    margin-top: 8px;
   }
 
   .evs-headline h1 {

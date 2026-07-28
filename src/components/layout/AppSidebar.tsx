@@ -16,6 +16,7 @@ import {
   Settings,
   CookingPot,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,39 +31,93 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { APP_VERSION_LABEL } from "@/lib/version";
+import { useAuth } from "@/contexts/AuthContext";
 
-const principal = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Clientes", url: "/clientes", icon: Users },
-  { title: "Avaliações", url: "/avaliacoes", icon: ClipboardList },
-  { title: "Acessos", url: "/acessos", icon: LogIn },
-  { title: "Agenda", url: "/agenda", icon: Calendar },
+type MenuItem = {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+  permissions: string[];
+};
+
+const principal: MenuItem[] = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, permissions: ["dashboard.view"] },
+  { title: "Clientes", url: "/clientes", icon: Users, permissions: ["clients.view"] },
+  {
+    title: "Avaliações",
+    url: "/avaliacoes",
+    icon: ClipboardList,
+    permissions: ["assessments.view", "assessments.create"],
+  },
+  {
+    title: "Acessos",
+    url: "/acessos",
+    icon: LogIn,
+    permissions: ["accesses.view", "accesses.create"],
+  },
+  { title: "Agenda", url: "/agenda", icon: Calendar, permissions: ["agenda.view"] },
 ];
-const comercial = [
-  { title: "Vendas (PDV)", url: "/vendas", icon: ShoppingCart },
-  { title: "Produtos", url: "/produtos", icon: Package },
-  { title: "Estoque", url: "/estoque", icon: Box },
-  { title: "Receitas", url: "/receitas", icon: CookingPot },
-  { title: "Financeiro", url: "/financeiro", icon: Wallet },
+const comercial: MenuItem[] = [
+  {
+    title: "Vendas (PDV)",
+    url: "/vendas",
+    icon: ShoppingCart,
+    permissions: ["sales.view", "sales.create"],
+  },
+  { title: "Produtos", url: "/produtos", icon: Package, permissions: ["products.view"] },
+  { title: "Estoque", url: "/estoque", icon: Box, permissions: ["inventory.view"] },
+  { title: "Receitas", url: "/receitas", icon: CookingPot, permissions: ["recipes.view"] },
+  { title: "Financeiro", url: "/financeiro", icon: Wallet, permissions: ["finance.view"] },
 ];
-const engajamento = [
-  { title: "Eventos", url: "/eventos", icon: PartyPopper },
-  { title: "Campanhas", url: "/campanhas", icon: Megaphone },
-  { title: "Relatórios", url: "/relatorios", icon: FileBarChart },
+const engajamento: MenuItem[] = [
+  { title: "Eventos", url: "/eventos", icon: PartyPopper, permissions: ["events.view"] },
+  {
+    title: "Campanhas",
+    url: "/campanhas",
+    icon: Megaphone,
+    permissions: ["campaigns.view"],
+  },
+  {
+    title: "Relatórios",
+    url: "/relatorios",
+    icon: FileBarChart,
+    permissions: [
+      "reports.clients",
+      "reports.assessments",
+      "reports.accesses",
+      "reports.sales",
+      "reports.inventory",
+      "reports.finance",
+    ],
+  },
 ];
-const sistema = [
-  { title: "Usuários", url: "/usuarios", icon: Shield },
-  { title: "Configurações", url: "/configuracoes", icon: Settings },
+const sistema: MenuItem[] = [
+  { title: "Usuários", url: "/usuarios", icon: Shield, permissions: ["users.view"] },
+  {
+    title: "Configurações",
+    url: "/configuracoes",
+    icon: Settings,
+    permissions: [
+      "settings.organization",
+      "settings.permissions",
+      "settings.integrations",
+      "settings.subscription.view",
+      "audit.view",
+    ],
+  },
 ];
 
-function Group({ label, items }: { label: string; items: typeof principal }) {
+function Group({ label, items }: { label: string; items: MenuItem[] }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { hasPermission } = useAuth();
+  const visibleItems = items.filter((item) => item.permissions.some(hasPermission));
+  if (!visibleItems.length) return null;
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const active = path === item.url || (item.url !== "/" && path.startsWith(item.url));
             return (
               <SidebarMenuItem key={item.url}>

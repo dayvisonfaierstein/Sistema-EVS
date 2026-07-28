@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { getDashboardMetrics } from "@/services/dashboard";
 import { useAuth } from "@/contexts/AuthContext";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Espaço+" }] }),
@@ -54,18 +55,22 @@ function Dashboard() {
         description="Visão geral do seu Espaço Vida Saudável hoje."
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/acessos">
-                <LogIn />
-                Registrar acesso
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/clientes/novo">
-                <Plus />
-                Novo cliente
-              </Link>
-            </Button>
+            <RequirePermission permission="accesses.create">
+              <Button asChild variant="outline">
+                <Link to="/acessos">
+                  <LogIn />
+                  Registrar acesso
+                </Link>
+              </Button>
+            </RequirePermission>
+            <RequirePermission permission="clients.create">
+              <Button asChild>
+                <Link to="/clientes/novo">
+                  <Plus />
+                  Novo cliente
+                </Link>
+              </Button>
+            </RequirePermission>
           </div>
         }
       />

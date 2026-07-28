@@ -92,7 +92,7 @@ const initialForm: InventoryMovementInput = {
 
 function InventoryPage() {
   const queryClient = useQueryClient();
-  const { can } = useAuth();
+  const { hasPermission } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<InventoryMovementInput>(initialForm);
   const products = useQuery({
@@ -125,7 +125,10 @@ function InventoryPage() {
     (Object.entries(lossReasonLabels) as Array<[LossReason, string]>).find(
       ([, label]) => label === form.reason,
     )?.[0] ?? "";
-  const canManageInventory = can("manager", "inventory");
+  const canRegisterEntry = hasPermission("inventory.create");
+  const canRegisterAdjustment = hasPermission("inventory.adjust");
+  const canRegisterLoss = hasPermission("inventory.loss");
+  const canManageInventory = canRegisterEntry || canRegisterAdjustment || canRegisterLoss;
 
   const stats = useMemo(() => {
     const catalog = products.data ?? [];
@@ -203,6 +206,13 @@ function InventoryPage() {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    const requiredPermission = ["loss", "expiration"].includes(form.movementType)
+      ? "inventory.loss"
+      : ["positive_adjustment", "negative_adjustment"].includes(form.movementType)
+        ? "inventory.adjust"
+        : "inventory.create";
+    if (!hasPermission(requiredPermission))
+      return toast.error("Seu usuário não possui permissão para esta movimentação.");
     if (!form.productId) return toast.error("Selecione o produto.");
     if (!Number.isFinite(form.quantity) || form.quantity <= 0)
       return toast.error("Informe uma quantidade válida.");
@@ -236,19 +246,32 @@ function InventoryPage() {
         actions={
           canManageInventory ? (
             <>
-              <Button variant="outline" onClick={openLossDialog}>
-                <Scale />
-                Registrar perda
-              </Button>
-              <Button
-                onClick={() => {
-                  setForm(initialForm);
-                  setDialogOpen(true);
-                }}
-              >
-                <Plus />
-                Nova movimentação
-              </Button>
+              {canRegisterLoss && (
+                <Button variant="outline" onClick={openLossDialog}>
+                  <Scale />
+                  Registrar perda
+                </Button>
+              )}
+              {(canRegisterEntry || canRegisterAdjustment) && (
+                <Button
+                  onClick={() => {
+                    setForm(
+                      canRegisterEntry
+                        ? initialForm
+                        : {
+                            ...initialForm,
+                            movementType: "positive_adjustment",
+                            quantityMode: "consumption",
+                            reason: "Ajuste positivo",
+                          },
+                    );
+                    setDialogOpen(true);
+                  }}
+                >
+                  <Plus />
+                  Nova movimentação
+                </Button>
+              )}
             </>
           ) : undefined
         }

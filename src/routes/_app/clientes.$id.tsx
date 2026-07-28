@@ -24,6 +24,7 @@ import { AssessmentSummaryCards } from "@/components/assessments/AssessmentSumma
 import { ExperiencePlansPanel } from "@/components/clients/ExperiencePlansPanel";
 import { ClientReferralsPanel } from "@/components/clients/ClientReferralsPanel";
 import { listClientConsumptions } from "@/services/operations";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 const searchSchema = z.object({
   tab: z
@@ -73,18 +74,22 @@ function ClientProfile() {
           Clientes
         </Link>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline">
-            <Link to="/clientes/editar/$id" params={{ id }}>
-              <Pencil />
-              Editar cadastro
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link to="/avaliacoes/nova" search={{ clientId: id }}>
-              <ClipboardList />
-              Nova avaliação
-            </Link>
-          </Button>
+          <RequirePermission permission="clients.update">
+            <Button asChild variant="outline">
+              <Link to="/clientes/editar/$id" params={{ id }}>
+                <Pencil />
+                Editar cadastro
+              </Link>
+            </Button>
+          </RequirePermission>
+          <RequirePermission permission="assessments.create">
+            <Button asChild>
+              <Link to="/avaliacoes/nova" search={{ clientId: id }}>
+                <ClipboardList />
+                Nova avaliação
+              </Link>
+            </Button>
+          </RequirePermission>
         </div>
       </div>
       <Card>

@@ -8,6 +8,29 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.18.2] - 2026-07-28
+
+### Adicionado
+
+- Fase 3 da arquitetura SaaS com proteção reutilizável de páginas e componentes;
+- Menu lateral filtrado pelas permissões efetivas do usuário;
+- Proteção de botões e ações críticas nos módulos atuais;
+- Página dedicada de acesso não autorizado;
+- Políticas RLS restritivas e permissivas para leitura e escrita dos módulos;
+- Validação por gatilho das operações, inclusive quando executadas por funções
+  `SECURITY DEFINER`;
+- Proteção de leitura, envio, substituição e remoção de arquivos no Supabase Storage;
+- Compatibilidade temporária com administradores e modelos atribuídos aos usuários
+  existentes;
+- Número da versão do sistema atualizado para v0.18.2.
+
+### Segurança
+
+- Uma ação oculta pela interface também passa a ser bloqueada pelo banco;
+- Experiência de 3 dias e indicações incluídas na matriz de autorização;
+- Permissões substituem gradualmente as verificações por perfis fixos, preservando
+  o funcionamento dos usuários migrados.
+
 ## [0.18.1] - 2026-07-28
 
 ### Adicionado

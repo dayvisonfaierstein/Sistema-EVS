@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { listAssessments } from "@/services/assessments";
 import { getClientPhotoUrls, listClients } from "@/services/clients";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/avaliacoes/")({
   head: () => ({ meta: [{ title: "Avaliações corporais — Espaço+" }] }),
@@ -40,12 +41,14 @@ function AssessmentsPage() {
         title="Avaliações Corporais"
         description="Acompanhe bioimpedância, medidas e evolução dos clientes ao longo do tempo."
         actions={
-          <Button asChild>
-            <Link to="/avaliacoes/nova">
-              <Plus />
-              Nova avaliação
-            </Link>
-          </Button>
+          <RequirePermission permission="assessments.create">
+            <Button asChild>
+              <Link to="/avaliacoes/nova">
+                <Plus />
+                Nova avaliação
+              </Link>
+            </Button>
+          </RequirePermission>
         }
       />
       <div className="grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">

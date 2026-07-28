@@ -30,6 +30,7 @@ import {
   type ProductFilters,
 } from "@/services/products";
 import type { Product } from "@/types/database";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/produtos/")({
   head: () => ({ meta: [{ title: "Produtos — Espaço+" }] }),
@@ -178,26 +179,32 @@ function ProductsPage() {
         }
         actions={
           <>
-            <Button
-              variant="outline"
-              onClick={() => printProductList(products.data ?? [])}
-              disabled={products.isLoading || products.isError || !products.data?.length}
-            >
-              <Printer />
-              Imprimir lista
-            </Button>
-            <Button asChild variant="outline">
-              <Link to="/produtos/importar-herbalife">
-                <Download />
-                Importar tabela PE
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/produtos/novo">
-                <Plus />
-                Novo produto
-              </Link>
-            </Button>
+            <RequirePermission permission="products.export">
+              <Button
+                variant="outline"
+                onClick={() => printProductList(products.data ?? [])}
+                disabled={products.isLoading || products.isError || !products.data?.length}
+              >
+                <Printer />
+                Imprimir lista
+              </Button>
+            </RequirePermission>
+            <RequirePermission anyOf={["products.create", "products.update"]}>
+              <Button asChild variant="outline">
+                <Link to="/produtos/importar-herbalife">
+                  <Download />
+                  Importar tabela PE
+                </Link>
+              </Button>
+            </RequirePermission>
+            <RequirePermission permission="products.create">
+              <Button asChild>
+                <Link to="/produtos/novo">
+                  <Plus />
+                  Novo produto
+                </Link>
+              </Button>
+            </RequirePermission>
           </>
         }
       />
@@ -325,11 +332,13 @@ function ProductsPage() {
                             <Eye />
                           </Link>
                         </Button>
-                        <Button asChild variant="ghost" size="icon" title="Editar produto">
-                          <Link to="/produtos/editar/$id" params={{ id: product.id }}>
-                            <Edit />
-                          </Link>
-                        </Button>
+                        <RequirePermission permission="products.update">
+                          <Button asChild variant="ghost" size="icon" title="Editar produto">
+                            <Link to="/produtos/editar/$id" params={{ id: product.id }}>
+                              <Edit />
+                            </Link>
+                          </Button>
+                        </RequirePermission>
                       </div>
                     </TableCell>
                   </TableRow>

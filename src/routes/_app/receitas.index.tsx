@@ -13,6 +13,7 @@ import {
   recipeAvailability,
   recipeTotals,
 } from "@/services/recipes";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/receitas/")({
   head: () => ({ meta: [{ title: "Receitas e preparações — Espaço+" }] }),
@@ -46,12 +47,14 @@ function RecipesPage() {
         title="Receitas e preparações"
         description="Padronize os preparos e acompanhe custo, margem e Pontos de Volume."
         actions={
-          <Button asChild>
-            <Link to="/receitas/novo">
-              <Plus />
-              Nova preparação
-            </Link>
-          </Button>
+          <RequirePermission permission="recipes.create">
+            <Button asChild>
+              <Link to="/receitas/novo">
+                <Plus />
+                Nova preparação
+              </Link>
+            </Button>
+          </RequirePermission>
         }
       />
       <Card>
@@ -109,20 +112,26 @@ function RecipesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <Metric label="Preço" value={money.format(recipe.sale_price)} />
-                  <Metric label="Custo" value={money.format(totals.cost)} />
+                  <RequirePermission permission="recipes.cost.view">
+                    <Metric label="Custo" value={money.format(totals.cost)} />
+                  </RequirePermission>
                   <Metric label="PV" value={number.format(totals.pv)} />
-                  <Metric label="Margem" value={`${number.format(totals.margin)}%`} />
+                  <RequirePermission permission="recipes.cost.view">
+                    <Metric label="Margem" value={`${number.format(totals.margin)}%`} />
+                  </RequirePermission>
                   <Metric
                     label="Disponibilidade"
                     value={available > 0 ? `${available} porção(ões)` : "Sem estoque"}
                   />
                 </div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/receitas/editar/$id" params={{ id: recipe.id }}>
-                    <Edit />
-                    Ver e editar preparação
-                  </Link>
-                </Button>
+                <RequirePermission permission="recipes.update">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/receitas/editar/$id" params={{ id: recipe.id }}>
+                      <Edit />
+                      Ver e editar preparação
+                    </Link>
+                  </Button>
+                </RequirePermission>
               </CardContent>
             </Card>
           );

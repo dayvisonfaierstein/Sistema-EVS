@@ -30,6 +30,7 @@ import {
 import { getCommercialReport, type CommercialReport } from "@/services/commercial-reports";
 import { lossReasonLabels, type LossReason } from "@/services/inventory";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/relatorios")({
   head: () => ({ meta: [{ title: "Relatórios comerciais — Espaço+" }] }),
@@ -158,18 +159,22 @@ function CommercialReports() {
         description="Estoque, custos, Pontos de Volume, consumo, preparações e perdas."
         actions={
           <>
-            <Button
-              variant="outline"
-              disabled={!data}
-              onClick={() => data && exportCsv(data, from, to)}
-            >
-              <FileSpreadsheet />
-              Exportar CSV
-            </Button>
-            <Button variant="outline" onClick={() => window.print()}>
-              <Printer />
-              Imprimir / PDF
-            </Button>
+            <RequirePermission anyOf={["inventory.export", "finance.reports.export"]}>
+              <Button
+                variant="outline"
+                disabled={!data}
+                onClick={() => data && exportCsv(data, from, to)}
+              >
+                <FileSpreadsheet />
+                Exportar CSV
+              </Button>
+            </RequirePermission>
+            <RequirePermission anyOf={["reports.inventory", "reports.finance"]}>
+              <Button variant="outline" onClick={() => window.print()}>
+                <Printer />
+                Imprimir / PDF
+              </Button>
+            </RequirePermission>
           </>
         }
       />

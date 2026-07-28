@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SemPermissaoRouteImport } from './routes/sem-permissao'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
@@ -44,6 +45,11 @@ import { Route as AppReceitasEditarIdRouteImport } from './routes/_app/receitas.
 import { Route as AppProdutosEditarIdRouteImport } from './routes/_app/produtos.editar.$id'
 import { Route as AppClientesEditarIdRouteImport } from './routes/_app/clientes.editar.$id'
 
+const SemPermissaoRoute = SemPermissaoRouteImport.update({
+  id: '/sem-permissao',
+  path: '/sem-permissao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
+  '/sem-permissao': typeof SemPermissaoRoute
   '/acessos': typeof AppAcessosRoute
   '/agenda': typeof AppAgendaRoute
   '/avaliacoes': typeof AppAvaliacoesRouteWithChildren
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
+  '/sem-permissao': typeof SemPermissaoRoute
   '/acessos': typeof AppAcessosRoute
   '/agenda': typeof AppAgendaRoute
   '/campanhas': typeof AppCampanhasRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
+  '/sem-permissao': typeof SemPermissaoRoute
   '/_app/acessos': typeof AppAcessosRoute
   '/_app/agenda': typeof AppAgendaRoute
   '/_app/avaliacoes': typeof AppAvaliacoesRouteWithChildren
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/portal'
+    | '/sem-permissao'
     | '/acessos'
     | '/agenda'
     | '/avaliacoes'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/portal'
+    | '/sem-permissao'
     | '/acessos'
     | '/agenda'
     | '/campanhas'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/portal'
+    | '/sem-permissao'
     | '/_app/acessos'
     | '/_app/agenda'
     | '/_app/avaliacoes'
@@ -431,10 +443,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   PortalRoute: typeof PortalRoute
+  SemPermissaoRoute: typeof SemPermissaoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sem-permissao': {
+      id: '/sem-permissao'
+      path: '/sem-permissao'
+      fullPath: '/sem-permissao'
+      preLoaderRoute: typeof SemPermissaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
@@ -778,6 +798,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   PortalRoute: PortalRoute,
+  SemPermissaoRoute: SemPermissaoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

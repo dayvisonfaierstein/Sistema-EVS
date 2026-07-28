@@ -1,21 +1,31 @@
-import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Outlet, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { getRouteRequirement } from "@/lib/permissions";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
 function AppLayout() {
-  const { session, profile, loading, configured } = useAuth();
+  const { session, profile, loading, configured, hasPermission } = useAuth();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   useEffect(() => {
-    if (configured && !loading && (!session || !profile?.active)) navigate({ to: "/login" });
-  }, [configured, loading, navigate, profile, session]);
+    if (!configured || loading) return;
+    if (!session || !profile?.active) {
+      navigate({ to: "/login", replace: true });
+      return;
+    }
+    const requirement = getRouteRequirement(pathname);
+    if (requirement && !requirement.anyOf.some(hasPermission)) {
+      navigate({ to: "/sem-permissao", replace: true });
+    }
+  }, [configured, hasPermission, loading, navigate, pathname, profile, session]);
   if (configured && loading)
     return (
       <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">

@@ -19,6 +19,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getClientPhotoUrls, listClients } from "@/services/clients";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { RequirePermission } from "@/components/auth/RequirePermission";
 
 export const Route = createFileRoute("/_app/clientes/")({
   head: () => ({ meta: [{ title: "Clientes — Espaço+" }] }),
@@ -54,18 +55,22 @@ function ClientesPage() {
         }
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline">
-              <Link to="/acessos">
-                <LogIn />
-                Registrar acesso
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/clientes/novo">
-                <Plus />
-                Novo cliente
-              </Link>
-            </Button>
+            <RequirePermission permission="accesses.create">
+              <Button asChild variant="outline">
+                <Link to="/acessos">
+                  <LogIn />
+                  Registrar acesso
+                </Link>
+              </Button>
+            </RequirePermission>
+            <RequirePermission permission="clients.create">
+              <Button asChild>
+                <Link to="/clientes/novo">
+                  <Plus />
+                  Novo cliente
+                </Link>
+              </Button>
+            </RequirePermission>
           </div>
         }
       />

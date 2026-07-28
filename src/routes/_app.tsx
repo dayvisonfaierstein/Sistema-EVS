@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const { session, profile, loading, configured, hasPermission } = useAuth();
+  const { session, profile, environment, loading, configured, hasPermission } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   useEffect(() => {
@@ -25,18 +25,26 @@ function AppLayout() {
       navigate({ to: "/onboarding", replace: true });
       return;
     }
+    if (environment?.accessAllowed === false) {
+      navigate({ to: "/aguardando-ativacao", replace: true });
+      return;
+    }
     const requirement = getRouteRequirement(pathname);
     if (requirement && !requirement.anyOf.some(hasPermission)) {
       navigate({ to: "/sem-permissao", replace: true });
     }
-  }, [configured, hasPermission, loading, navigate, pathname, profile, session]);
+  }, [configured, environment, hasPermission, loading, navigate, pathname, profile, session]);
   if (configured && loading)
     return (
       <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">
         Carregando ambiente seguro...
       </div>
     );
-  if (configured && (!session || !profile?.active || profile.first_access)) return null;
+  if (
+    configured &&
+    (!session || !profile?.active || profile.first_access || environment?.accessAllowed === false)
+  )
+    return null;
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">

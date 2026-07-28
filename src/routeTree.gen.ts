@@ -13,6 +13,7 @@ import { Route as SemPermissaoRouteImport } from './routes/sem-permissao'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AguardandoAtivacaoRouteImport } from './routes/aguardando-ativacao'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -69,6 +70,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguardandoAtivacaoRoute = AguardandoAtivacaoRouteImport.update({
+  id: '/aguardando-ativacao',
+  path: '/aguardando-ativacao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -260,6 +266,7 @@ const AppClientesEditarIdRoute = AppClientesEditarIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/aguardando-ativacao': typeof AguardandoAtivacaoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
@@ -301,6 +308,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aguardando-ativacao': typeof AguardandoAtivacaoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
@@ -342,6 +350,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/aguardando-ativacao': typeof AguardandoAtivacaoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/portal': typeof PortalRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/aguardando-ativacao'
     | '/login'
     | '/onboarding'
     | '/portal'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aguardando-ativacao'
     | '/login'
     | '/onboarding'
     | '/portal'
@@ -467,6 +478,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/admin'
+    | '/aguardando-ativacao'
     | '/login'
     | '/onboarding'
     | '/portal'
@@ -511,6 +523,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  AguardandoAtivacaoRoute: typeof AguardandoAtivacaoRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   PortalRoute: typeof PortalRoute
@@ -545,6 +558,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aguardando-ativacao': {
+      id: '/aguardando-ativacao'
+      path: '/aguardando-ativacao'
+      fullPath: '/aguardando-ativacao'
+      preLoaderRoute: typeof AguardandoAtivacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -927,6 +947,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  AguardandoAtivacaoRoute: AguardandoAtivacaoRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   PortalRoute: PortalRoute,

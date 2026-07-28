@@ -7,6 +7,7 @@ type AuthValue = {
   session: Session | null;
   profile: Profile | null;
   permissions: string[];
+  environment: EnvironmentAccess | null;
   loading: boolean;
   configured: boolean;
   signIn(email: string, password: string): Promise<void>;
@@ -16,6 +17,16 @@ type AuthValue = {
   hasPermission(permission: string): boolean;
 };
 
+export type EnvironmentAccess = {
+  organizationId: string | null;
+  organizationName: string | null;
+  onboardingCompleted: boolean;
+  organizationStatus: string;
+  subscriptionStatus: string;
+  accessAllowed: boolean;
+  blockReason: string | null;
+};
+
 const AuthContext = createContext<AuthValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -23,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [environment, setEnvironment] = useState<EnvironmentAccess | null>(null);
   const [loading, setLoading] = useState(configured);
 
   useEffect(() => {
@@ -33,18 +45,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!next) {
         setProfile(null);
         setPermissions([]);
+        setEnvironment(null);
         setLoading(false);
         return;
       }
-      const [{ data }, permissionResult] = await Promise.all([
+      const [{ data }, permissionResult, environmentResult] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", next.user.id).single(),
         supabase.rpc("get_my_permissions"),
+        supabase.rpc("get_my_environment_access"),
       ]);
       setProfile(data as Profile | null);
       setPermissions(
         (permissionResult.data ?? []).map(
           (item: { permission_key: string }) => item.permission_key,
         ),
+      );
+      const environmentRow = environmentResult.data?.[0] as
+        | {
+            organization_id: string | null;
+            organization_name: string | null;
+            onboarding_completed: boolean;
+            organization_status: string;
+            subscription_status: string;
+            access_allowed: boolean;
+            block_reason: string | null;
+          }
+        | undefined;
+      setEnvironment(
+        environmentRow
+          ? {
+              organizationId: environmentRow.organization_id,
+              organizationName: environmentRow.organization_name,
+              onboardingCompleted: environmentRow.onboarding_completed,
+              organizationStatus: environmentRow.organization_status,
+              subscriptionStatus: environmentRow.subscription_status,
+              accessAllowed: environmentRow.access_allowed,
+              blockReason: environmentRow.block_reason,
+            }
+          : null,
       );
       if (data?.active) {
         await supabase
@@ -64,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       profile,
       permissions,
+      environment,
       loading,
       configured,
       async signIn(email, password) {
@@ -101,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         );
       },
     }),
-    [configured, loading, permissions, profile, session],
+    [configured, environment, loading, permissions, profile, session],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

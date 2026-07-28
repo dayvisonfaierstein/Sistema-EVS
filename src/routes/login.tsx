@@ -26,7 +26,7 @@ function resolveLoginIdentifier(identifier: string) {
 
 function LoginRoute() {
   const navigate = useNavigate();
-  const { signIn, resetPassword, session, profile, configured } = useAuth();
+  const { signIn, resetPassword, session, profile, environment, configured } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,14 +37,16 @@ function LoginRoute() {
           ? "/onboarding"
           : profile.is_platform_admin || profile.role === "super_admin"
             ? "/admin"
-            : profile.role === "client"
-              ? "/portal"
-              : "/dashboard",
+            : environment?.accessAllowed === false
+              ? "/aguardando-ativacao"
+              : profile.role === "client"
+                ? "/portal"
+                : "/dashboard",
       });
     } else if (session && !profile) {
       navigate({ to: "/onboarding" });
     }
-  }, [navigate, profile, session]);
+  }, [environment, navigate, profile, session]);
 
   async function handleLogin({ email, password }: LoginCredentials) {
     setError(null);

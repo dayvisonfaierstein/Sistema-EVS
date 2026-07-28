@@ -166,6 +166,61 @@ export async function listAdminOrganizations() {
   return (data ?? []) as Organization[];
 }
 
+export type AdminOrganizationInput = Pick<
+  Organization,
+  | "legal_name"
+  | "trade_name"
+  | "document"
+  | "legal_document_type"
+  | "phone"
+  | "whatsapp"
+  | "email"
+  | "address"
+  | "address_number"
+  | "address_complement"
+  | "neighborhood"
+  | "city"
+  | "state"
+  | "postal_code"
+  | "responsible_name"
+  | "responsible_phone"
+  | "responsible_whatsapp"
+  | "responsible_email"
+>;
+
+export async function updateAdminOrganization(id: string, input: AdminOrganizationInput) {
+  const payload = {
+    ...input,
+    legal_name: input.legal_name.trim(),
+    trade_name: input.trade_name.trim(),
+    document: input.document?.replace(/\D/g, "") || null,
+    legal_document_type: input.legal_document_type?.trim() || null,
+    phone: input.phone?.trim() || null,
+    whatsapp: input.whatsapp?.trim() || null,
+    email: input.email?.trim().toLowerCase() || null,
+    address: input.address?.trim() || null,
+    address_number: input.address_number?.trim() || null,
+    address_complement: input.address_complement?.trim() || null,
+    neighborhood: input.neighborhood?.trim() || null,
+    city: input.city?.trim() || null,
+    state: input.state?.trim().toUpperCase() || null,
+    postal_code: input.postal_code?.trim() || null,
+    responsible_name: input.responsible_name?.trim() || null,
+    responsible_phone: input.responsible_phone?.trim() || null,
+    responsible_whatsapp: input.responsible_whatsapp?.trim() || null,
+    responsible_email: input.responsible_email?.trim().toLowerCase() || null,
+  };
+  const { data, error } = await getSupabase()
+    .from("organizations")
+    .update(payload)
+    .eq("id", id)
+    .select()
+    .single();
+  throwIfError(error);
+  if (!data) throw new Error("O Supabase não confirmou a atualização da organização.");
+  return data as Organization;
+}
+
 export type ProvisionOrganizationInput = {
   legalName: string;
   tradeName: string;

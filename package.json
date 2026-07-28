@@ -1,6 +1,6 @@
 {
   "name": "espaco-mais",
-  "version": "0.24.2",
+  "version": "0.25.0",
   "private": true,
   "sideEffects": false,
   "type": "module",

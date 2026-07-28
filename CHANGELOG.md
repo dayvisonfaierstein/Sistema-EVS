@@ -8,6 +8,18 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.11.1] - 2026-07-28
+
+### Corrigido
+
+- Os botões de visualizar e editar na relação de produtos agora abrem suas respectivas páginas;
+- A rota de listagem foi separada do layout de Produtos para permitir a renderização das páginas filhas;
+- O cadastro, a substituição e a remoção da foto agora podem ser acessados normalmente pela edição do produto.
+
+### Alterado
+
+- Número da versão do sistema atualizado para v0.11.1.
+
 ## [0.11.0] - 2026-07-28
 
 ### Adicionado

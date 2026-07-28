@@ -27,6 +27,7 @@ import { Route as AppCampanhasRouteImport } from './routes/_app/campanhas'
 import { Route as AppAvaliacoesRouteImport } from './routes/_app/avaliacoes'
 import { Route as AppAgendaRouteImport } from './routes/_app/agenda'
 import { Route as AppAcessosRouteImport } from './routes/_app/acessos'
+import { Route as AppProdutosIndexRouteImport } from './routes/_app/produtos.index'
 import { Route as AppClientesIndexRouteImport } from './routes/_app/clientes.index'
 import { Route as AppAvaliacoesIndexRouteImport } from './routes/_app/avaliacoes.index'
 import { Route as AppProdutosNovoRouteImport } from './routes/_app/produtos.novo'
@@ -128,6 +129,11 @@ const AppAcessosRoute = AppAcessosRouteImport.update({
   path: '/acessos',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProdutosIndexRoute = AppProdutosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppProdutosRoute,
+} as any)
 const AppClientesIndexRoute = AppClientesIndexRouteImport.update({
   id: '/clientes/',
   path: '/clientes/',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/produtos/novo': typeof AppProdutosNovoRoute
   '/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/clientes/': typeof AppClientesIndexRoute
+  '/produtos/': typeof AppProdutosIndexRoute
   '/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/produtos/editar/$id': typeof AppProdutosEditarIdRoute
 }
@@ -228,7 +235,6 @@ export interface FileRoutesByTo {
   '/estoque': typeof AppEstoqueRoute
   '/eventos': typeof AppEventosRoute
   '/financeiro': typeof AppFinanceiroRoute
-  '/produtos': typeof AppProdutosRouteWithChildren
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/vendas': typeof AppVendasRoute
@@ -241,6 +247,7 @@ export interface FileRoutesByTo {
   '/produtos/novo': typeof AppProdutosNovoRoute
   '/avaliacoes': typeof AppAvaliacoesIndexRoute
   '/clientes': typeof AppClientesIndexRoute
+  '/produtos': typeof AppProdutosIndexRoute
   '/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/produtos/editar/$id': typeof AppProdutosEditarIdRoute
 }
@@ -273,6 +280,7 @@ export interface FileRoutesById {
   '/_app/produtos/novo': typeof AppProdutosNovoRoute
   '/_app/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/_app/clientes/': typeof AppClientesIndexRoute
+  '/_app/produtos/': typeof AppProdutosIndexRoute
   '/_app/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/_app/produtos/editar/$id': typeof AppProdutosEditarIdRoute
 }
@@ -305,6 +313,7 @@ export interface FileRouteTypes {
     | '/produtos/novo'
     | '/avaliacoes/'
     | '/clientes/'
+    | '/produtos/'
     | '/clientes/editar/$id'
     | '/produtos/editar/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -321,7 +330,6 @@ export interface FileRouteTypes {
     | '/estoque'
     | '/eventos'
     | '/financeiro'
-    | '/produtos'
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
@@ -334,6 +342,7 @@ export interface FileRouteTypes {
     | '/produtos/novo'
     | '/avaliacoes'
     | '/clientes'
+    | '/produtos'
     | '/clientes/editar/$id'
     | '/produtos/editar/$id'
   id:
@@ -365,6 +374,7 @@ export interface FileRouteTypes {
     | '/_app/produtos/novo'
     | '/_app/avaliacoes/'
     | '/_app/clientes/'
+    | '/_app/produtos/'
     | '/_app/clientes/editar/$id'
     | '/_app/produtos/editar/$id'
   fileRoutesById: FileRoutesById
@@ -505,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAcessosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/produtos/': {
+      id: '/_app/produtos/'
+      path: '/'
+      fullPath: '/produtos/'
+      preLoaderRoute: typeof AppProdutosIndexRouteImport
+      parentRoute: typeof AppProdutosRoute
+    }
     '/_app/clientes/': {
       id: '/_app/clientes/'
       path: '/clientes'
@@ -605,6 +622,7 @@ interface AppProdutosRouteChildren {
   AppProdutosIdRoute: typeof AppProdutosIdRoute
   AppProdutosImportarHerbalifeRoute: typeof AppProdutosImportarHerbalifeRoute
   AppProdutosNovoRoute: typeof AppProdutosNovoRoute
+  AppProdutosIndexRoute: typeof AppProdutosIndexRoute
   AppProdutosEditarIdRoute: typeof AppProdutosEditarIdRoute
 }
 
@@ -612,6 +630,7 @@ const AppProdutosRouteChildren: AppProdutosRouteChildren = {
   AppProdutosIdRoute: AppProdutosIdRoute,
   AppProdutosImportarHerbalifeRoute: AppProdutosImportarHerbalifeRoute,
   AppProdutosNovoRoute: AppProdutosNovoRoute,
+  AppProdutosIndexRoute: AppProdutosIndexRoute,
   AppProdutosEditarIdRoute: AppProdutosEditarIdRoute,
 }
 

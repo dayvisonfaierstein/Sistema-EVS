@@ -8,6 +8,18 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.10.2] - 2026-07-28
+
+### Adicionado
+
+- Opção para imprimir a lista de produtos cadastrados;
+- Relatório de impressão com produto, SKU, categoria, PV, preço de venda, estoque e status;
+- A impressão respeita a busca e os filtros aplicados na tela de Produtos.
+
+### Alterado
+
+- Número da versão do sistema atualizado para v0.10.2.
+
 ## [0.10.1] - 2026-07-27
 
 ### Corrigido

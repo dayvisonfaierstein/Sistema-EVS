@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Edit, Eye, Package, Plus, Search } from "lucide-react";
+import { Download, Edit, Eye, Package, Plus, Printer, Search } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageChrome";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,104 @@ function stockStatus(product: Product) {
   return { label: "Em estoque", style: "border-success/30 bg-success/10 text-success" };
 }
 
+function escapeHtml(value: string) {
+  const entities: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+
+  return value.replace(/[&<>"']/g, (character) => entities[character]);
+}
+
+function printProductList(products: Product[]) {
+  const printWindow = window.open("", "_blank", "width=1100,height=800");
+
+  if (!printWindow) {
+    toast.error("Não foi possível abrir a impressão. Permita pop-ups para este site.");
+    return;
+  }
+
+  const generatedAt = new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date());
+  const rows = products
+    .map((product) => {
+      const status = stockStatus(product).label;
+      const stock = `${product.current_stock.toLocaleString("pt-BR")} ${product.consumption_unit}`;
+
+      return `
+        <tr>
+          <td><strong>${escapeHtml(product.name)}</strong></td>
+          <td>${escapeHtml(product.sku || "—")}</td>
+          <td>${escapeHtml(product.product_categories?.name || "Sem categoria")}</td>
+          <td class="numeric">${product.volume_points?.toLocaleString("pt-BR") ?? "—"}</td>
+          <td class="numeric">${escapeHtml(money.format(product.sale_price))}</td>
+          <td class="numeric">${escapeHtml(stock)}</td>
+          <td>${escapeHtml(status)}</td>
+        </tr>`;
+    })
+    .join("");
+
+  printWindow.document.write(`<!doctype html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Lista de produtos — Espaço+</title>
+        <style>
+          @page { size: A4 landscape; margin: 12mm; }
+          * { box-sizing: border-box; }
+          body { margin: 0; color: #14231b; font-family: Arial, sans-serif; font-size: 10pt; }
+          header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 18px; }
+          h1 { margin: 0 0 5px; color: #08783f; font-size: 22pt; }
+          p { margin: 0; color: #647067; }
+          .summary { text-align: right; white-space: nowrap; }
+          table { width: 100%; border-collapse: collapse; }
+          thead { display: table-header-group; }
+          tr { break-inside: avoid; }
+          th { padding: 9px 8px; border-bottom: 2px solid #159851; background: #edf8f0; color: #075b34; text-align: left; font-size: 9pt; }
+          td { padding: 8px; border-bottom: 1px solid #dfe7e1; vertical-align: top; }
+          tbody tr:nth-child(even) { background: #f8faf8; }
+          .numeric { text-align: right; white-space: nowrap; }
+          footer { margin-top: 14px; color: #7a857d; font-size: 8pt; text-align: right; }
+        </style>
+      </head>
+      <body>
+        <header>
+          <div>
+            <h1>Espaço+</h1>
+            <p>Lista de produtos cadastrados</p>
+          </div>
+          <div class="summary">
+            <strong>${products.length} produto(s)</strong>
+            <p>Emitido em ${escapeHtml(generatedAt)}</p>
+          </div>
+        </header>
+        <table>
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>SKU</th>
+              <th>Categoria</th>
+              <th class="numeric">PV</th>
+              <th class="numeric">Preço de venda</th>
+              <th class="numeric">Estoque</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <footer>Espaço+ • Gestão inteligente para transformar resultados</footer>
+      </body>
+    </html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  window.setTimeout(() => printWindow.print(), 250);
+}
+
 function ProductsPage() {
   const [filters, setFilters] = useState<ProductFilters>({ active: "all", stock: "all" });
   const products = useQuery({
@@ -79,6 +178,14 @@ function ProductsPage() {
         }
         actions={
           <>
+            <Button
+              variant="outline"
+              onClick={() => printProductList(products.data ?? [])}
+              disabled={products.isLoading || products.isError || !products.data?.length}
+            >
+              <Printer />
+              Imprimir lista
+            </Button>
             <Button asChild variant="outline">
               <Link to="/produtos/importar-herbalife">
                 <Download />

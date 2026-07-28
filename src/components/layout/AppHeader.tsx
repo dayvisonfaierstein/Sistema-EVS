@@ -28,9 +28,11 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { getSupabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/types/database";
+import { usePlatformAnnouncements } from "@/components/communications/PlatformAnnouncements";
 
 export function AppHeader() {
   const { profile, environment, signOut, configured } = useAuth();
+  const { unreadCount, openCenter } = usePlatformAnnouncements();
   const [profileOpen, setProfileOpen] = useState(false);
   const organization = useQuery({
     queryKey: ["header-organization", profile?.organization_id],
@@ -72,11 +74,19 @@ export function AppHeader() {
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input placeholder="Buscar clientes, produtos..." className="pl-9" />
       </div>
-      <Button variant="ghost" size="icon" className="relative shrink-0">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative shrink-0"
+        onClick={openCenter}
+        aria-label="Abrir central de mensagens"
+      >
         <Bell className="size-5" />
-        <Badge className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full px-1 text-[10px]">
-          3
-        </Badge>
+        {unreadCount > 0 && (
+          <Badge className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full px-1 text-[10px]">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </Badge>
+        )}
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

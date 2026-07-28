@@ -34,6 +34,31 @@ export type PlatformAnnouncement = {
   created_at: string;
 };
 
+export type AnnouncementReceipt = {
+  announcement_id: string;
+  first_seen_at: string | null;
+  last_displayed_at: string | null;
+  read_at: string | null;
+  acknowledged_at: string | null;
+  dismissed_at: string | null;
+  display_count: number;
+};
+
+export type ReceivedAnnouncement = PlatformAnnouncement & {
+  receipt: AnnouncementReceipt | null;
+  image_url: string | null;
+};
+
+export type AnnouncementMetric = {
+  announcement_id: string;
+  recipient_organizations: number;
+  reached_users: number;
+  read_users: number;
+  acknowledged_users: number;
+  dismissed_users: number;
+  total_displays: number;
+};
+
 export type AnnouncementInput = Omit<
   PlatformAnnouncement,
   "id" | "image_path" | "status" | "published_at" | "created_at"
@@ -95,6 +120,128 @@ export async function publishPlatformAnnouncement(id: string, organizationIds: s
   const { error } = await getSupabase().rpc("admin_publish_platform_announcement", {
     target_announcement_id: id,
     target_organization_ids: organizationIds,
+  });
+  fail(error);
+}
+
+export async function updatePlatformAnnouncement(
+  id: string,
+  input: AnnouncementInput,
+  image?: File | null,
+) {
+  const supabase = getSupabase();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Sessão não encontrada.");
+  const { error } = await supabase
+    .from("platform_announcements")
+    .update({
+      ...input,
+      starts_at: input.starts_at || null,
+      ends_at: input.ends_at || null,
+      action_label: input.action_label?.trim() || null,
+      action_url: input.action_url?.trim() || null,
+      updated_by: auth.user.id,
+    })
+    .eq("id", id);
+  fail(error);
+  if (image) {
+    const extension =
+      image.type === "image/png" ? "png" : image.type === "image/webp" ? "webp" : "jpg";
+    const path = `${id}/card.${extension}`;
+    const { error: uploadError } = await supabase.storage
+      .from("platform-announcements")
+      .upload(path, image, { contentType: image.type, upsert: true });
+    fail(uploadError);
+    const { error: imageError } = await supabase
+      .from("platform_announcements")
+      .update({ image_path: path })
+      .eq("id", id);
+    fail(imageError);
+  }
+}
+
+export async function cancelPlatformAnnouncement(id: string) {
+  const { error } = await getSupabase().rpc("admin_cancel_platform_announcement", {
+    target_announcement_id: id,
+  });
+  fail(error);
+}
+
+export async function listAnnouncementMetrics(): Promise<AnnouncementMetric[]> {
+  const { data, error } = await getSupabase().rpc("admin_platform_announcement_metrics");
+  fail(error);
+  return ((data ?? []) as AnnouncementMetric[]).map((item) => ({
+    ...item,
+    recipient_organizations: Number(item.recipient_organizations),
+    reached_users: Number(item.reached_users),
+    read_users: Number(item.read_users),
+    acknowledged_users: Number(item.acknowledged_users),
+    dismissed_users: Number(item.dismissed_users),
+    total_displays: Number(item.total_displays),
+  }));
+}
+
+export async function listAnnouncementRecipientIds(id: string) {
+  const { data, error } = await getSupabase()
+    .from("platform_announcement_recipients")
+    .select("organization_id")
+    .eq("announcement_id", id);
+  fail(error);
+  return (data ?? []).map((item: { organization_id: string }) => item.organization_id);
+}
+
+export async function listReceivedAnnouncements(): Promise<ReceivedAnnouncement[]> {
+  const supabase = getSupabase();
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) return [];
+  const [{ data: announcements, error }, { data: receipts, error: receiptError }] =
+    await Promise.all([
+      supabase
+        .from("platform_announcements")
+        .select("*")
+        .in("status", ["scheduled", "published"])
+        .order("priority", { ascending: false })
+        .order("published_at", { ascending: false }),
+      supabase
+        .from("platform_announcement_receipts")
+        .select(
+          "announcement_id,first_seen_at,last_displayed_at,read_at,acknowledged_at,dismissed_at,display_count",
+        )
+        .eq("profile_id", auth.user.id),
+    ]);
+  fail(error);
+  fail(receiptError);
+  const receiptMap = new Map(
+    ((receipts ?? []) as AnnouncementReceipt[]).map((receipt) => [
+      receipt.announcement_id,
+      receipt,
+    ]),
+  );
+  return Promise.all(
+    ((announcements ?? []) as PlatformAnnouncement[]).map(async (announcement) => {
+      let imageUrl: string | null = null;
+      if (announcement.image_path) {
+        const { data } = await supabase.storage
+          .from("platform-announcements")
+          .createSignedUrl(announcement.image_path, 3600);
+        imageUrl = data?.signedUrl ?? null;
+      }
+      return {
+        ...announcement,
+        receipt: receiptMap.get(announcement.id) ?? null,
+        image_url: imageUrl,
+      };
+    }),
+  );
+}
+
+export async function recordAnnouncementEvent(
+  id: string,
+  event: "displayed" | "read" | "acknowledged" | "dismissed",
+) {
+  const { error } = await getSupabase().rpc("record_platform_announcement_event", {
+    target_announcement_id: id,
+    target_event: event,
   });
   fail(error);
 }

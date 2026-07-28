@@ -6,6 +6,10 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { getRouteRequirement } from "@/lib/permissions";
+import {
+  PlatformAnnouncementDisplays,
+  PlatformAnnouncementsProvider,
+} from "@/components/communications/PlatformAnnouncements";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -46,17 +50,20 @@ function AppLayout() {
   )
     return null;
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
-        <SidebarInset className="flex min-w-0 flex-1 flex-col">
-          <AppHeader />
-          <main className="flex-1 p-4 sm:p-6">
-            <Outlet />
-          </main>
-        </SidebarInset>
-      </div>
-      <Toaster richColors position="top-right" />
-    </SidebarProvider>
+    <PlatformAnnouncementsProvider>
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-background">
+          <AppSidebar />
+          <SidebarInset className="flex min-w-0 flex-1 flex-col">
+            <AppHeader />
+            <main className="flex-1 p-4 sm:p-6">
+              <PlatformAnnouncementDisplays />
+              <Outlet />
+            </main>
+          </SidebarInset>
+        </div>
+        <Toaster richColors position="top-right" />
+      </SidebarProvider>
+    </PlatformAnnouncementsProvider>
   );
 }

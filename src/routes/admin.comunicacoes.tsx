@@ -1,6 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BellRing, CalendarClock, ImagePlus, Megaphone, Plus, Send } from "lucide-react";
+import {
+  BarChart3,
+  BellRing,
+  CalendarClock,
+  Eye,
+  ImagePlus,
+  Megaphone,
+  Pencil,
+  Plus,
+  Send,
+  XCircle,
+} from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageHeader, StatCard } from "@/components/layout/PageChrome";
@@ -23,12 +34,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { listAdminOrganizations } from "@/services/platform-admin";
 import {
   createPlatformAnnouncement,
+  cancelPlatformAnnouncement,
+  listAnnouncementMetrics,
+  listAnnouncementRecipientIds,
   listPlatformAnnouncements,
   publishPlatformAnnouncement,
+  updatePlatformAnnouncement,
   type AnnouncementAudience,
   type AnnouncementChannel,
   type AnnouncementInput,
   type AnnouncementPriority,
+  type PlatformAnnouncement,
 } from "@/services/platform-communications";
 
 export const Route = createFileRoute("/admin/comunicacoes")({
@@ -73,6 +89,8 @@ const initialForm: AnnouncementInput = {
 function CommunicationsPage() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [detailsId, setDetailsId] = useState<string | null>(null);
   const [form, setForm] = useState<AnnouncementInput>(initialForm);
   const [selectedOrganizations, setSelectedOrganizations] = useState<string[]>([]);
   const [image, setImage] = useState<File | null>(null);
@@ -85,6 +103,10 @@ function CommunicationsPage() {
     queryKey: ["admin-organizations"],
     queryFn: listAdminOrganizations,
   });
+  const metrics = useQuery({
+    queryKey: ["platform-announcement-metrics"],
+    queryFn: listAnnouncementMetrics,
+  });
   const previewUrl = useMemo(() => (image ? URL.createObjectURL(image) : null), [image]);
   useEffect(
     () => () => {
@@ -95,19 +117,44 @@ function CommunicationsPage() {
 
   const mutation = useMutation({
     mutationFn: async (shouldPublish: boolean) => {
+      if (editingId) {
+        await updatePlatformAnnouncement(editingId, form, image);
+        if (shouldPublish) {
+          await publishPlatformAnnouncement(editingId, selectedOrganizations);
+        }
+        return;
+      }
       const announcement = await createPlatformAnnouncement(form, image);
       if (shouldPublish) await publishPlatformAnnouncement(announcement.id, selectedOrganizations);
     },
     onSuccess: async (_data, shouldPublish) => {
-      toast.success(shouldPublish ? "Comunicado publicado." : "Rascunho salvo.");
+      toast.success(
+        editingId
+          ? shouldPublish
+            ? "Comunicado atualizado e publicado."
+            : "Comunicado atualizado."
+          : shouldPublish
+            ? "Comunicado publicado."
+            : "Rascunho salvo.",
+      );
       setOpen(false);
       reset();
       await queryClient.invalidateQueries({ queryKey: ["platform-announcements"] });
+      await queryClient.invalidateQueries({ queryKey: ["platform-announcement-metrics"] });
     },
     onError: (mutationError) => {
       setError(mutationError.message);
       toast.error(mutationError.message);
     },
+  });
+  const cancelMutation = useMutation({
+    mutationFn: cancelPlatformAnnouncement,
+    onSuccess: async () => {
+      toast.success("Comunicado cancelado.");
+      await queryClient.invalidateQueries({ queryKey: ["platform-announcements"] });
+      await queryClient.invalidateQueries({ queryKey: ["platform-announcement-metrics"] });
+    },
+    onError: (mutationError) => toast.error(mutationError.message),
   });
 
   function reset() {
@@ -115,6 +162,29 @@ function CommunicationsPage() {
     setSelectedOrganizations([]);
     setImage(null);
     setError(null);
+    setEditingId(null);
+  }
+  async function edit(item: PlatformAnnouncement) {
+    setEditingId(item.id);
+    setForm({
+      title: item.title,
+      message: item.message,
+      announcement_type: item.announcement_type,
+      priority: item.priority,
+      audience_type: item.audience_type,
+      display_channels: item.display_channels,
+      action_label: item.action_label ?? "",
+      action_url: item.action_url ?? "",
+      show_once: item.show_once,
+      dismissible: item.dismissible,
+      requires_acknowledgement: item.requires_acknowledgement,
+      starts_at: item.starts_at ? item.starts_at.slice(0, 16) : "",
+      ends_at: item.ends_at ? item.ends_at.slice(0, 16) : "",
+    });
+    setSelectedOrganizations(
+      item.audience_type === "organizations" ? await listAnnouncementRecipientIds(item.id) : [],
+    );
+    setOpen(true);
   }
   function toggleChannel(channel: AnnouncementChannel) {
     setForm({
@@ -141,6 +211,8 @@ function CommunicationsPage() {
   }
 
   const data = announcements.data ?? [];
+  const metricMap = new Map((metrics.data ?? []).map((metric) => [metric.announcement_id, metric]));
+  const details = data.find((item) => item.id === detailsId) ?? null;
   return (
     <div>
       <PageHeader
@@ -179,6 +251,7 @@ function CommunicationsPage() {
                   <th className="px-4 py-3">Canais</th>
                   <th className="px-4 py-3">Situação</th>
                   <th className="px-4 py-3">Criação</th>
+                  <th className="px-4 py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -213,6 +286,42 @@ function CommunicationsPage() {
                     <td className="px-4 py-3 text-muted-foreground">
                       {new Date(item.created_at).toLocaleDateString("pt-BR")}
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          title="Ver resultados"
+                          onClick={() => setDetailsId(item.id)}
+                        >
+                          <Eye />
+                        </Button>
+                        {item.status !== "cancelled" && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            title="Editar"
+                            onClick={() => void edit(item)}
+                          >
+                            <Pencil />
+                          </Button>
+                        )}
+                        {item.status !== "cancelled" && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="text-destructive"
+                            title="Cancelar"
+                            onClick={() => {
+                              if (window.confirm(`Cancelar o comunicado “${item.title}”?`))
+                                cancelMutation.mutate(item.id);
+                            }}
+                          >
+                            <XCircle />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -235,7 +344,7 @@ function CommunicationsPage() {
       >
         <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Novo comunicado</DialogTitle>
+            <DialogTitle>{editingId ? "Editar comunicado" : "Novo comunicado"}</DialogTitle>
             <DialogDescription>
               Configure conteúdo, destinatários e como o aviso será apresentado.
             </DialogDescription>
@@ -417,13 +526,59 @@ function CommunicationsPage() {
               Cancelar
             </Button>
             <Button variant="outline" onClick={() => submit(false)} disabled={mutation.isPending}>
-              Salvar rascunho
+              {editingId ? "Salvar alterações" : "Salvar rascunho"}
             </Button>
-            <Button onClick={() => submit(true)} disabled={mutation.isPending}>
-              <Send />
-              Publicar
-            </Button>
+            {(!editingId ||
+              data.find((item) => item.id === editingId)?.status === "draft" ||
+              data.find((item) => item.id === editingId)?.status === "scheduled") && (
+              <Button onClick={() => submit(true)} disabled={mutation.isPending}>
+                <Send />
+                Publicar
+              </Button>
+            )}
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={Boolean(details)} onOpenChange={(value) => !value && setDetailsId(null)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{details?.title}</DialogTitle>
+            <DialogDescription>Alcance e interações registradas até agora.</DialogDescription>
+          </DialogHeader>
+          {details && (
+            <div className="grid gap-3 py-3 sm:grid-cols-2">
+              <Metric
+                label="Espaços destinatários"
+                value={metricMap.get(details.id)?.recipient_organizations ?? 0}
+                icon={Megaphone}
+              />
+              <Metric
+                label="Usuários alcançados"
+                value={metricMap.get(details.id)?.reached_users ?? 0}
+                icon={Eye}
+              />
+              <Metric
+                label="Leituras"
+                value={metricMap.get(details.id)?.read_users ?? 0}
+                icon={BellRing}
+              />
+              <Metric
+                label="Confirmações"
+                value={metricMap.get(details.id)?.acknowledged_users ?? 0}
+                icon={BarChart3}
+              />
+              <Metric
+                label="Fechamentos"
+                value={metricMap.get(details.id)?.dismissed_users ?? 0}
+                icon={XCircle}
+              />
+              <Metric
+                label="Total de exibições"
+                value={metricMap.get(details.id)?.total_displays ?? 0}
+                icon={CalendarClock}
+              />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
@@ -452,5 +607,27 @@ function Toggle({
       <span>{label}</span>
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
+  );
+}
+
+function Metric({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  icon: typeof Megaphone;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border p-4">
+      <div className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="size-5" />
+      </div>
+      <div>
+        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-xs text-muted-foreground">{label}</div>
+      </div>
+    </div>
   );
 }

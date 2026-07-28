@@ -8,6 +8,18 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.17.1] - 2026-07-28
+
+### Documentação
+
+- Concluída a Fase 0 de auditoria para a evolução SaaS e financeira;
+- Mapeados autenticação, organizações, usuários, RLS, onboarding, Super Admin,
+  financeiro, vendas e auditoria;
+- Registrados riscos, componentes reutilizáveis e estratégia incremental de
+  migração;
+- Definido o escopo técnico e os critérios de conclusão da Fase 1;
+- Número da versão do sistema atualizado para v0.17.1.
+
 ## [0.17.0] - 2026-07-28
 
 ### Adicionado

@@ -9,6 +9,7 @@ export function StatCard({
   icon: Icon,
   tone = "primary",
   trend,
+  sparkline,
 }: {
   title: string;
   value: string | number;
@@ -16,6 +17,7 @@ export function StatCard({
   icon: LucideIcon;
   tone?: "primary" | "info" | "warning" | "destructive" | "success";
   trend?: { value: string; up?: boolean };
+  sparkline?: number[];
 }) {
   const tones: Record<string, string> = {
     primary: "bg-primary-soft text-primary",
@@ -24,6 +26,14 @@ export function StatCard({
     destructive: "bg-[color:oklch(0.96_0.05_25)] text-destructive",
     success: "bg-primary-soft text-success",
   };
+  const chart = sparkline?.length
+    ? sparkline.map((point, index) => {
+        const min = Math.min(...sparkline);
+        const max = Math.max(...sparkline);
+        const range = max - min || 1;
+        return `${(index / Math.max(sparkline.length - 1, 1)) * 100},${28 - ((point - min) / range) * 24}`;
+      })
+    : [];
   return (
     <Card className="border-border/60 shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="p-5">
@@ -43,6 +53,27 @@ export function StatCard({
               >
                 {trend.up ? "▲" : "▼"} {trend.value}
               </div>
+            )}
+            {chart.length > 1 && (
+              <svg
+                aria-label={`Evolução recente de ${title}`}
+                className={cn(
+                  "mt-3 h-7 w-24 overflow-visible",
+                  trend?.up === false ? "text-destructive" : "text-success",
+                )}
+                viewBox="0 0 100 32"
+                preserveAspectRatio="none"
+              >
+                <polyline
+                  fill="none"
+                  points={chart.join(" ")}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2.5"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
             )}
           </div>
           <div className={cn("grid size-11 shrink-0 place-items-center rounded-xl", tones[tone])}>

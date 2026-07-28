@@ -4,8 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Boxes,
+  CalendarClock,
   CalendarRange,
   CircleDollarSign,
+  FileSpreadsheet,
   Package,
   Printer,
   TrendingDown,
@@ -25,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCommercialReport } from "@/services/commercial-reports";
+import { getCommercialReport, type CommercialReport } from "@/services/commercial-reports";
 import { lossReasonLabels, type LossReason } from "@/services/inventory";
 import { isSupabaseConfigured } from "@/integrations/supabase/client";
 
@@ -48,6 +50,81 @@ function currentMonth() {
     from: dateInput(new Date(now.getFullYear(), now.getMonth(), 1)),
     to: dateInput(now),
   };
+}
+
+const movementLabels: Record<string, string> = {
+  purchase: "Compra",
+  positive_adjustment: "Ajuste positivo",
+  return: "Devolução",
+  consumption: "Consumo",
+  sale: "Venda",
+  loss: "Perda",
+  expiration: "Vencimento",
+  negative_adjustment: "Ajuste negativo",
+};
+
+function exportCsv(data: CommercialReport, from: string, to: string) {
+  const rows: Array<Array<string | number>> = [
+    ["RELATÓRIO COMERCIAL ESPAÇO+", `${from} a ${to}`],
+    [],
+    ["INDICADOR", "VALOR"],
+    ["Produtos cadastrados", data.stock.products],
+    ["Estoque baixo", data.stock.low],
+    ["Produtos sem estoque", data.stock.empty],
+    ["Valor do estoque", data.stock.value.toFixed(2)],
+    ["PV comprado", data.pv.purchased.toFixed(2)],
+    ["PV consumido", data.pv.consumed.toFixed(2)],
+    ["PV perdido", data.pv.lost.toFixed(2)],
+    ["PV restante", data.pv.remaining.toFixed(2)],
+    ["Custo consumido", data.period.cost.toFixed(2)],
+    ["Receita estimada", data.period.revenue.toFixed(2)],
+    ["Lucro bruto", data.period.profit.toFixed(2)],
+    ["Margem (%)", data.period.margin.toFixed(2)],
+    [],
+    ["PRODUTOS MAIS CONSUMIDOS"],
+    ["Produto", "Quantidade", "Custo", "PV"],
+    ...data.topProducts.map((item) => [
+      item.name,
+      item.quantity,
+      item.cost.toFixed(2),
+      item.pv.toFixed(2),
+    ]),
+    [],
+    ["MOVIMENTAÇÕES"],
+    ["Data", "Produto", "Tipo", "Quantidade", "Unidade", "Motivo", "Custo", "PV"],
+    ...data.movements.map((item) => [
+      new Date(item.date).toLocaleString("pt-BR"),
+      item.product,
+      movementLabels[item.type] ?? item.type,
+      item.quantity,
+      item.unit,
+      item.reason,
+      item.cost.toFixed(2),
+      item.pv.toFixed(2),
+    ]),
+    [],
+    ["LOTES E VALIDADE"],
+    ["Produto", "Lote", "Validade", "Quantidade", "Unidade", "Valor"],
+    ...data.batches.map((item) => [
+      item.product,
+      item.batch,
+      item.expirationDate
+        ? new Date(`${item.expirationDate}T12:00:00`).toLocaleDateString("pt-BR")
+        : "Sem validade",
+      item.quantity,
+      item.unit,
+      item.value.toFixed(2),
+    ]),
+  ];
+  const csv = rows
+    .map((row) => row.map((cell) => `"${String(cell ?? "").replaceAll('"', '""')}"`).join(";"))
+    .join("\r\n");
+  const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `relatorio-comercial-${from}-${to}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function CommercialReports() {
@@ -80,10 +157,20 @@ function CommercialReports() {
         title="Relatórios comerciais"
         description="Estoque, custos, Pontos de Volume, consumo, preparações e perdas."
         actions={
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer />
-            Imprimir relatório
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              disabled={!data}
+              onClick={() => data && exportCsv(data, from, to)}
+            >
+              <FileSpreadsheet />
+              Exportar CSV
+            </Button>
+            <Button variant="outline" onClick={() => window.print()}>
+              <Printer />
+              Imprimir / PDF
+            </Button>
+          </>
         }
       />
 
@@ -206,6 +293,38 @@ function CommercialReports() {
                 title="Margem"
                 value={`${decimal.format(data.period.margin)}%`}
                 icon={TrendingUp}
+                tone="primary"
+              />
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">Balanço de Pontos de Volume</h2>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <StatCard
+                title="PV comprado"
+                value={decimal.format(data.pv.purchased)}
+                hint="entradas no período"
+                icon={TrendingUp}
+                tone="success"
+              />
+              <StatCard
+                title="PV consumido"
+                value={decimal.format(data.pv.consumed)}
+                icon={Package}
+                tone="info"
+              />
+              <StatCard
+                title="PV perdido"
+                value={decimal.format(data.pv.lost)}
+                icon={TrendingDown}
+                tone="destructive"
+              />
+              <StatCard
+                title="PV restante"
+                value={decimal.format(data.pv.remaining)}
+                hint="saldo atual do estoque"
+                icon={Boxes}
                 tone="primary"
               />
             </div>
@@ -368,6 +487,109 @@ function CommercialReports() {
               }))}
             />
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Movimentações no período</CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Produto</TableHead>
+                    <TableHead>Movimentação</TableHead>
+                    <TableHead className="text-right">Quantidade</TableHead>
+                    <TableHead>Motivo</TableHead>
+                    <TableHead className="text-right">Custo</TableHead>
+                    <TableHead className="text-right">PV</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.movements.map((movement, index) => (
+                    <TableRow key={`${movement.date}-${movement.product}-${index}`}>
+                      <TableCell className="whitespace-nowrap">
+                        {new Date(movement.date).toLocaleString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="font-medium">{movement.product}</TableCell>
+                      <TableCell>{movementLabels[movement.type] ?? movement.type}</TableCell>
+                      <TableCell className="text-right">
+                        {decimal.format(movement.quantity)} {movement.unit}
+                      </TableCell>
+                      <TableCell>{movement.reason || "—"}</TableCell>
+                      <TableCell className="text-right">{currency.format(movement.cost)}</TableCell>
+                      <TableCell className="text-right">{decimal.format(movement.pv)}</TableCell>
+                    </TableRow>
+                  ))}
+                  {!data.movements.length && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                        Nenhuma movimentação no período.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarClock className="size-5 text-primary" />
+                Lotes e validade
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Produto</TableHead>
+                    <TableHead>Lote</TableHead>
+                    <TableHead>Validade</TableHead>
+                    <TableHead className="text-right">Saldo</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.batches.map((batch) => {
+                    const expiration = batch.expirationDate
+                      ? new Date(`${batch.expirationDate}T12:00:00`)
+                      : null;
+                    const days = expiration
+                      ? Math.ceil((expiration.getTime() - Date.now()) / 86_400_000)
+                      : null;
+                    return (
+                      <TableRow key={batch.id}>
+                        <TableCell className="font-medium">{batch.product}</TableCell>
+                        <TableCell>{batch.batch}</TableCell>
+                        <TableCell
+                          className={
+                            days !== null && days <= 30 ? "font-semibold text-destructive" : ""
+                          }
+                        >
+                          {expiration ? expiration.toLocaleDateString("pt-BR") : "Sem validade"}
+                          {days !== null && days >= 0 && days <= 30 ? ` · ${days} dias` : ""}
+                          {days !== null && days < 0 ? " · vencido" : ""}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {decimal.format(batch.quantity)} {batch.unit}
+                        </TableCell>
+                        <TableCell className="text-right">{currency.format(batch.value)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {!data.batches.length && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                        Nenhum lote ativo com saldo.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

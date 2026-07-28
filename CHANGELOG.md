@@ -8,6 +8,22 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.17.0] - 2026-07-28
+
+### Adicionado
+
+- Dashboard comercial com produtos cadastrados, estoque baixo, produtos sem estoque, valor do estoque, PV disponível, PV consumido, custo consumido e perdas do mês;
+- Ícones coloridos por contexto e minigráficos de evolução recente nos indicadores de PV, custo e perdas;
+- Balanço de PV comprado, consumido, perdido e restante nos relatórios;
+- Relatórios de movimentações por período e de lotes com validade e alertas de vencimento;
+- Exportação do relatório comercial em CSV compatível com Excel e impressão em PDF pelo navegador.
+
+### Melhorado
+
+- Organização visual do dashboard em blocos de operação, visão comercial e financeiro;
+- Consolidação dos resultados por preparação, produto, categoria, perdas, custo, faturamento e margem;
+- Número da versão do sistema atualizado para v0.17.0.
+
 ## [0.16.0] - 2026-07-28
 
 ### Adicionado

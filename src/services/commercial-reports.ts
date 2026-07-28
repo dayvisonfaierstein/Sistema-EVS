@@ -37,10 +37,23 @@ type MovementRow = {
   product_id: string;
   movement_type: string;
   quantity: number;
+  unit: string | null;
+  reason: string | null;
   loss_reason: string | null;
   cost_total: number | null;
   pv_total: number | null;
   created_at: string;
+};
+
+type BatchRow = {
+  id: string;
+  product_id: string;
+  batch_number: string;
+  expiration_date: string | null;
+  current_quantity: number;
+  unit_cost: number;
+  status: string;
+  products: { name: string; consumption_unit: string } | null;
 };
 
 export type CommercialReport = {
@@ -80,6 +93,27 @@ export type CommercialReport = {
     cost: number;
     pv: number;
   }>;
+  pv: { purchased: number; consumed: number; lost: number; remaining: number };
+  movements: Array<{
+    date: string;
+    product: string;
+    type: string;
+    quantity: number;
+    unit: string;
+    reason: string;
+    cost: number;
+    pv: number;
+  }>;
+  batches: Array<{
+    id: string;
+    product: string;
+    batch: string;
+    expirationDate: string | null;
+    quantity: number;
+    unit: string;
+    value: number;
+    status: string;
+  }>;
 };
 
 const number = (value: unknown) => Number(value ?? 0);
@@ -99,50 +133,66 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
   historyStart.setUTCHours(0, 0, 0, 0);
   historyStart.setUTCMonth(historyStart.getUTCMonth() - 5);
 
-  const [productsResult, consumptionResult, itemResult, movementResult, monthlyResult] =
-    await Promise.all([
-      db
-        .from("products")
-        .select(
-          "id,name,current_stock,minimum_stock,average_cost,volume_points,package_content,consumption_unit,active,product_categories(name)",
-        )
-        .eq("active", true),
-      db
-        .from("access_consumptions")
-        .select(
-          "id,item_name_snapshot,consumption_type,quantity,sale_price_snapshot,cost_total,pv_total,created_at",
-        )
-        .gte("created_at", start)
-        .lt("created_at", end)
-        .order("created_at"),
-      db
-        .from("consumption_items")
-        .select("product_id,product_name_snapshot,quantity,cost_total,pv_total,created_at")
-        .gte("created_at", start)
-        .lt("created_at", end),
-      db
-        .from("inventory_movements")
-        .select("product_id,movement_type,quantity,loss_reason,cost_total,pv_total,created_at")
-        .not("loss_reason", "is", null)
-        .gte("created_at", start)
-        .lt("created_at", end),
-      db
-        .from("access_consumptions")
-        .select("cost_total,pv_total,sale_price_snapshot,quantity,created_at")
-        .gte("created_at", historyStart.toISOString())
-        .order("created_at"),
-    ]);
+  const [
+    productsResult,
+    consumptionResult,
+    itemResult,
+    movementResult,
+    monthlyResult,
+    batchResult,
+  ] = await Promise.all([
+    db
+      .from("products")
+      .select(
+        "id,name,current_stock,minimum_stock,average_cost,volume_points,package_content,consumption_unit,active,product_categories(name)",
+      )
+      .eq("active", true),
+    db
+      .from("access_consumptions")
+      .select(
+        "id,item_name_snapshot,consumption_type,quantity,sale_price_snapshot,cost_total,pv_total,created_at",
+      )
+      .gte("created_at", start)
+      .lt("created_at", end)
+      .order("created_at"),
+    db
+      .from("consumption_items")
+      .select("product_id,product_name_snapshot,quantity,cost_total,pv_total,created_at")
+      .gte("created_at", start)
+      .lt("created_at", end),
+    db
+      .from("inventory_movements")
+      .select(
+        "product_id,movement_type,quantity,unit,reason,loss_reason,cost_total,pv_total,created_at",
+      )
+      .gte("created_at", start)
+      .lt("created_at", end),
+    db
+      .from("access_consumptions")
+      .select("cost_total,pv_total,sale_price_snapshot,quantity,created_at")
+      .gte("created_at", historyStart.toISOString())
+      .order("created_at"),
+    db
+      .from("product_batches")
+      .select(
+        "id,product_id,batch_number,expiration_date,current_quantity,unit_cost,status,products(name,consumption_unit)",
+      )
+      .gt("current_quantity", 0)
+      .order("expiration_date", { ascending: true, nullsFirst: false }),
+  ]);
 
   assertQuery(productsResult.error, "Não foi possível carregar os produtos");
   assertQuery(consumptionResult.error, "Não foi possível carregar os consumos");
   assertQuery(itemResult.error, "Não foi possível carregar os itens consumidos");
-  assertQuery(movementResult.error, "Não foi possível carregar as perdas");
+  assertQuery(movementResult.error, "Não foi possível carregar as movimentações");
   assertQuery(monthlyResult.error, "Não foi possível carregar o histórico mensal");
+  assertQuery(batchResult.error, "Não foi possível carregar os lotes");
 
   const products = (productsResult.data ?? []) as unknown as ProductRow[];
   const consumptions = (consumptionResult.data ?? []) as ConsumptionRow[];
   const items = (itemResult.data ?? []) as ConsumptionItemRow[];
   const movements = (movementResult.data ?? []) as MovementRow[];
+  const batches = (batchResult.data ?? []) as unknown as BatchRow[];
   const productMap = new Map(products.map((product) => [product.id, product]));
 
   const stock = products.reduce(
@@ -189,23 +239,25 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
   period.margin = period.revenue > 0 ? (period.profit / period.revenue) * 100 : 0;
 
   const lossMap = new Map<string, CommercialReport["losses"][number]>();
-  movements.forEach((movement) => {
-    const reason = movement.loss_reason ?? "other";
-    const current = lossMap.get(reason) ?? {
-      reason,
-      entries: 0,
-      quantity: 0,
-      cost: 0,
-      pv: 0,
-    };
-    current.entries += 1;
-    current.quantity += number(movement.quantity);
-    current.cost += number(movement.cost_total);
-    current.pv += number(movement.pv_total);
-    period.lossCost += number(movement.cost_total);
-    period.lossPv += number(movement.pv_total);
-    lossMap.set(reason, current);
-  });
+  movements
+    .filter((movement) => movement.loss_reason)
+    .forEach((movement) => {
+      const reason = movement.loss_reason ?? "other";
+      const current = lossMap.get(reason) ?? {
+        reason,
+        entries: 0,
+        quantity: 0,
+        cost: 0,
+        pv: 0,
+      };
+      current.entries += 1;
+      current.quantity += number(movement.quantity);
+      current.cost += number(movement.cost_total);
+      current.pv += number(movement.pv_total);
+      period.lossCost += number(movement.cost_total);
+      period.lossPv += number(movement.pv_total);
+      lossMap.set(reason, current);
+    });
 
   const preparationMap = new Map<string, CommercialReport["topPreparations"][number]>();
   consumptions.forEach((consumption) => {
@@ -281,6 +333,34 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
     month.revenue += number(row.sale_price_snapshot);
   });
 
+  const entryTypes = new Set(["purchase", "positive_adjustment", "return"]);
+  const purchasedPv = movements
+    .filter((movement) => entryTypes.has(movement.movement_type))
+    .reduce((total, movement) => {
+      const product = productMap.get(movement.product_id);
+      const content = number(product?.package_content);
+      return content > 0
+        ? total + number(movement.quantity) * (number(product?.volume_points) / content)
+        : total;
+    }, 0);
+  const movementReport = movements.map((movement) => {
+    const product = productMap.get(movement.product_id);
+    const content = number(product?.package_content);
+    const calculatedPv =
+      content > 0 ? number(movement.quantity) * (number(product?.volume_points) / content) : 0;
+    return {
+      date: movement.created_at,
+      product: product?.name ?? "Produto removido",
+      type: movement.movement_type,
+      quantity: number(movement.quantity),
+      unit: movement.unit || product?.consumption_unit || "un",
+      reason: movement.reason || "",
+      cost:
+        number(movement.cost_total) || number(movement.quantity) * number(product?.average_cost),
+      pv: number(movement.pv_total) || calculatedPv,
+    };
+  });
+
   return {
     stock,
     period,
@@ -293,5 +373,24 @@ export async function getCommercialReport(from: string, to: string): Promise<Com
       .slice(0, 8),
     categories: [...categoryMap.values()].sort((a, b) => b.cost - a.cost),
     losses: [...lossMap.values()].sort((a, b) => b.cost - a.cost),
+    pv: {
+      purchased: purchasedPv,
+      consumed: period.pvConsumed,
+      lost: period.lossPv,
+      remaining: stock.pv,
+    },
+    movements: movementReport.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    ),
+    batches: batches.map((batch) => ({
+      id: batch.id,
+      product: batch.products?.name ?? "Produto removido",
+      batch: batch.batch_number,
+      expirationDate: batch.expiration_date,
+      quantity: number(batch.current_quantity),
+      unit: batch.products?.consumption_unit ?? "un",
+      value: number(batch.current_quantity) * number(batch.unit_cost),
+      status: batch.status,
+    })),
   };
 }

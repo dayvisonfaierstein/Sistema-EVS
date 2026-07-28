@@ -1,10 +1,37 @@
 import { getSupabase } from "@/integrations/supabase/client";
 
+const sum = <T>(rows: T[], field: keyof T) =>
+  rows.reduce((total, row) => total + Number(row[field] ?? 0), 0);
+
+const variation = (current: number, previous: number) => {
+  if (!previous) return current ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+};
+
+const dailySeries = <T extends { created_at?: string | null }>(
+  rows: T[],
+  value: (row: T) => number,
+) => {
+  const today = new Date();
+  return Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (6 - offset));
+    const key = date.toISOString().slice(0, 10);
+    return rows
+      .filter((row) => row.created_at?.slice(0, 10) === key)
+      .reduce((total, row) => total + value(row), 0);
+  });
+};
+
 export async function getDashboardMetrics() {
   const db = getSupabase();
-  const now = new Date(),
-    month = new Date(now.getFullYear(), now.getMonth(), 1),
-    day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const now = new Date();
+  const month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const sevenDaysAgo = new Date(day);
+  sevenDaysAgo.setDate(day.getDate() - 6);
+
   const [
     active,
     newClients,
@@ -13,9 +40,13 @@ export async function getDashboardMetrics() {
     assessments,
     income,
     expenses,
-    lowStock,
+    productResult,
     consumptions,
+    previousConsumptions,
     losses,
+    previousLosses,
+    recentConsumptions,
+    recentLosses,
   ] = await Promise.all([
     db.from("clients").select("*", { count: "exact", head: true }).eq("status", "active"),
     db
@@ -52,39 +83,65 @@ export async function getDashboardMetrics() {
       .eq("active", true),
     db
       .from("access_consumptions")
+      .select("cost_total,pv_total,created_at")
+      .gte("created_at", month.toISOString()),
+    db
+      .from("access_consumptions")
       .select("cost_total,pv_total")
+      .gte("created_at", previousMonth.toISOString())
+      .lt("created_at", month.toISOString()),
+    db
+      .from("inventory_movements")
+      .select("cost_total,pv_total,created_at")
+      .not("loss_reason", "is", null)
       .gte("created_at", month.toISOString()),
     db
       .from("inventory_movements")
       .select("cost_total,pv_total")
       .not("loss_reason", "is", null)
-      .gte("created_at", month.toISOString()),
+      .gte("created_at", previousMonth.toISOString())
+      .lt("created_at", month.toISOString()),
+    db
+      .from("access_consumptions")
+      .select("cost_total,pv_total,created_at")
+      .gte("created_at", sevenDaysAgo.toISOString()),
+    db
+      .from("inventory_movements")
+      .select("cost_total,pv_total,created_at")
+      .not("loss_reason", "is", null)
+      .gte("created_at", sevenDaysAgo.toISOString()),
   ]);
-  const revenue = (income.data ?? []).reduce((s, x) => s + Number(x.amount), 0),
-    expense = (expenses.data ?? []).reduce((s, x) => s + Number(x.amount), 0);
-  const products = lowStock.data ?? [];
-  const pvConsumed = (consumptions.data ?? []).reduce(
-    (sum, item) => sum + Number(item.pv_total),
-    0,
-  );
-  const consumptionCost = (consumptions.data ?? []).reduce(
-    (sum, item) => sum + Number(item.cost_total),
-    0,
-  );
-  const lossCost = (losses.data ?? []).reduce(
-    (sum, movement) => sum + Number(movement.cost_total ?? 0),
-    0,
-  );
+
+  const revenue = sum(income.data ?? [], "amount");
+  const expense = sum(expenses.data ?? [], "amount");
+  const products = productResult.data ?? [];
+  const consumptionRows = consumptions.data ?? [];
+  const previousConsumptionRows = previousConsumptions.data ?? [];
+  const lossRows = losses.data ?? [];
+  const previousLossRows = previousLosses.data ?? [];
+  const pvConsumed = sum(consumptionRows, "pv_total");
+  const consumptionCost = sum(consumptionRows, "cost_total");
+  const lossCost = sum(lossRows, "cost_total");
+  const previousPvConsumed = sum(previousConsumptionRows, "pv_total");
+  const previousConsumptionCost = sum(previousConsumptionRows, "cost_total");
+  const previousLossCost = sum(previousLossRows, "cost_total");
   const stockValue = products.reduce(
-    (sum, product) => sum + Number(product.current_stock) * Number(product.average_cost),
+    (total, product) => total + Number(product.current_stock) * Number(product.average_cost),
     0,
   );
-  const stockPv = products.reduce((sum, product) => {
+  const stockPv = products.reduce((total, product) => {
     const content = Number(product.package_content);
     return content > 0
-      ? sum + Number(product.current_stock) * (Number(product.volume_points) / content)
-      : sum;
+      ? total + Number(product.current_stock) * (Number(product.volume_points) / content)
+      : total;
   }, 0);
+  const lowStock = products.filter(
+    (product) =>
+      Number(product.current_stock) > 0 &&
+      Number(product.current_stock) <= Number(product.minimum_stock),
+  );
+  const outOfStock = products.filter((product) => Number(product.current_stock) <= 0);
+
   return {
     activeClients: active.count ?? 0,
     newClients: newClients.count ?? 0,
@@ -94,11 +151,24 @@ export async function getDashboardMetrics() {
     revenue,
     expenses: expense,
     profit: revenue - expense,
+    productsCount: products.length,
+    lowStockCount: lowStock.length,
+    outOfStockCount: outOfStock.length,
     stockValue,
     stockPv,
     pvConsumed,
     consumptionCost,
     lossCost,
-    lowStock: products.filter((p) => Number(p.current_stock) <= Number(p.minimum_stock)),
+    lowStock,
+    trends: {
+      pvConsumed: variation(pvConsumed, previousPvConsumed),
+      consumptionCost: variation(consumptionCost, previousConsumptionCost),
+      lossCost: variation(lossCost, previousLossCost),
+    },
+    sparklines: {
+      pvConsumed: dailySeries(recentConsumptions.data ?? [], (row) => Number(row.pv_total)),
+      consumptionCost: dailySeries(recentConsumptions.data ?? [], (row) => Number(row.cost_total)),
+      lossCost: dailySeries(recentLosses.data ?? [], (row) => Number(row.cost_total)),
+    },
   };
 }

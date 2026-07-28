@@ -51,7 +51,7 @@ import {
   type InventoryMovementInput,
   type InventoryMovementType,
 } from "@/services/inventory";
-import { listProducts } from "@/services/products";
+import { getProductPhotoUrls, listProducts } from "@/services/products";
 
 export const Route = createFileRoute("/_app/estoque")({
   head: () => ({ meta: [{ title: "Estoque — Espaço+" }] }),
@@ -100,6 +100,17 @@ function InventoryPage() {
   const movements = useQuery({
     queryKey: ["inventory-movements"],
     queryFn: () => listInventoryMovements(),
+  });
+  const movementPhotos = useQuery({
+    queryKey: [
+      "inventory-movement-photos",
+      movements.data?.map((movement) => movement.products?.photo_url),
+    ],
+    queryFn: () =>
+      getProductPhotoUrls(
+        (movements.data ?? []).map((movement) => movement.products?.photo_url ?? null),
+      ),
+    enabled: Boolean(movements.data?.some((movement) => movement.products?.photo_url)),
   });
   const expiringBatches = useQuery({
     queryKey: ["inventory-expiring-batches", 60],
@@ -288,9 +299,25 @@ function InventoryPage() {
                       })}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium">{movement.products?.name ?? "Produto"}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {movement.products?.sku || "Sem SKU"}
+                      <div className="flex min-w-52 items-center gap-3">
+                        <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-lg border bg-primary-soft text-primary">
+                          {movement.products?.photo_url &&
+                          movementPhotos.data?.[movement.products.photo_url] ? (
+                            <img
+                              src={movementPhotos.data[movement.products.photo_url]}
+                              alt={movement.products.name}
+                              className="size-full object-contain"
+                            />
+                          ) : (
+                            <Package className="size-5" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-medium">{movement.products?.name ?? "Produto"}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {movement.products?.sku || "Sem SKU"}
+                          </div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>

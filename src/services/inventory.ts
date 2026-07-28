@@ -25,7 +25,7 @@ export type InventoryMovementInput = {
 };
 
 export type InventoryMovementWithRelations = InventoryMovement & {
-  products: Pick<Product, "id" | "name" | "sku" | "consumption_unit"> | null;
+  products: Pick<Product, "id" | "name" | "sku" | "consumption_unit" | "photo_url"> | null;
   profiles: { full_name: string } | null;
 };
 
@@ -33,7 +33,7 @@ export async function listInventoryMovements(limit = 100) {
   const { data, error } = await getSupabase()
     .from("inventory_movements")
     .select(
-      "*, products(id,name,sku,consumption_unit), profiles!inventory_movements_user_id_fkey(full_name)",
+      "*, products(id,name,sku,consumption_unit,photo_url), profiles!inventory_movements_user_id_fkey(full_name)",
     )
     .order("created_at", { ascending: false })
     .limit(limit);

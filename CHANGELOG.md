@@ -8,6 +8,17 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.11.2] - 2026-07-28
+
+### Adicionado
+
+- Fotos dos produtos na relação de movimentações recentes do estoque;
+- Identificação visual alternativa para produtos que ainda não possuem foto cadastrada.
+
+### Alterado
+
+- Número da versão do sistema atualizado para v0.11.2.
+
 ## [0.11.1] - 2026-07-28
 
 ### Corrigido

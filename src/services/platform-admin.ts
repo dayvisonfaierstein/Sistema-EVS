@@ -221,6 +221,14 @@ export async function updateAdminOrganization(id: string, input: AdminOrganizati
   return data as Organization;
 }
 
+export async function archiveAdminOrganization(id: string, reason?: string) {
+  const { error } = await getSupabase().rpc("admin_archive_organization", {
+    target_organization_id: id,
+    archive_reason: reason?.trim() || null,
+  });
+  throwIfError(error);
+}
+
 export type ProvisionOrganizationInput = {
   legalName: string;
   tradeName: string;

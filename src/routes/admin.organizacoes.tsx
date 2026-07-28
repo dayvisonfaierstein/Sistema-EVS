@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, Pencil, Save, Search } from "lucide-react";
+import { Building2, Eye, Pencil, Save, Search, Trash2 } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageChrome";
@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  archiveAdminOrganization,
   listAdminOrganizations,
   updateAdminOrganization,
   type AdminOrganizationInput,
@@ -44,6 +45,7 @@ function OrganizationsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Organization | null>(null);
+  const [viewing, setViewing] = useState<Organization | null>(null);
   const query = useQuery({
     queryKey: ["admin-organizations"],
     queryFn: listAdminOrganizations,
@@ -72,6 +74,23 @@ function OrganizationsPage() {
     },
     onError: (error) => toast.error(error.message),
   });
+  const archiveMutation = useMutation({
+    mutationFn: (organizationId: string) => archiveAdminOrganization(organizationId),
+    onSuccess: async () => {
+      toast.success("Organização excluída com os históricos preservados.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-organizations"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-subscriptions"] });
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  function confirmArchive(organization: Organization) {
+    const confirmed = window.confirm(
+      `Excluir a organização "${organization.trade_name}"?\n\nOs usuários serão bloqueados e a assinatura será cancelada. Os históricos serão preservados.`,
+    );
+    if (confirmed) archiveMutation.mutate(organization.id);
+  }
 
   return (
     <div>
@@ -108,7 +127,7 @@ function OrganizationsPage() {
                   <th className="px-4 py-3">Contato</th>
                   <th className="px-4 py-3">Situação</th>
                   <th className="px-4 py-3">Cadastro</th>
-                  <th className="w-20 px-4 py-3 text-right">Ações</th>
+                  <th className="w-32 px-4 py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -145,10 +164,37 @@ function OrganizationsPage() {
                       {new Date(organization.created_at).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button variant="outline" size="sm" onClick={() => setEditing(organization)}>
-                        <Pencil />
-                        Editar
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Visualizar"
+                          aria-label={`Visualizar ${organization.trade_name}`}
+                          onClick={() => setViewing(organization)}
+                        >
+                          <Eye className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Editar"
+                          aria-label={`Editar ${organization.trade_name}`}
+                          onClick={() => setEditing(organization)}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Excluir"
+                          aria-label={`Excluir ${organization.trade_name}`}
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          disabled={archiveMutation.isPending}
+                          onClick={() => confirmArchive(organization)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -173,7 +219,67 @@ function OrganizationsPage() {
         onClose={() => setEditing(null)}
         onSave={(input) => updateMutation.mutate(input)}
       />
+      <ViewOrganizationDialog organization={viewing} onClose={() => setViewing(null)} />
     </div>
+  );
+}
+
+function ViewOrganizationDialog({
+  organization,
+  onClose,
+}: {
+  organization: Organization | null;
+  onClose(): void;
+}) {
+  if (!organization) return null;
+
+  const address = [
+    organization.address,
+    organization.address_number,
+    organization.address_complement,
+    organization.neighborhood,
+    organization.city,
+    organization.state,
+    organization.postal_code,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  const items = [
+    ["Razão social", organization.legal_name],
+    ["Documento", organization.document],
+    ["Situação", statusLabels[organization.status]],
+    ["E-mail", organization.email],
+    ["Telefone", organization.phone],
+    ["WhatsApp", organization.whatsapp],
+    ["Endereço", address],
+    ["Responsável", organization.responsible_name],
+    ["E-mail do responsável", organization.responsible_email],
+    ["Telefone do responsável", organization.responsible_phone],
+    ["Cadastro", new Date(organization.created_at).toLocaleDateString("pt-BR")],
+  ];
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>{organization.trade_name}</DialogTitle>
+          <DialogDescription>Dados cadastrais da organização.</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
+          {items.map(([label, value]) => (
+            <div key={label} className={label === "Endereço" ? "sm:col-span-2" : ""}>
+              <div className="text-xs font-medium uppercase text-muted-foreground">{label}</div>
+              <div className="mt-1 text-sm">{value || "—"}</div>
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Fechar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

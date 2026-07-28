@@ -8,6 +8,12 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.8] - 2026-07-27
+
+### Alterado
+
+- Favicon do sistema substituído pelo símbolo oficial do Espaço+.
+
 ## [0.6.7] - 2026-07-27
 
 ### Alterado

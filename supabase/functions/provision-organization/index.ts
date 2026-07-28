@@ -77,10 +77,29 @@ Deno.serve(async (request) => {
 
     const { data: existingProfile } = await serviceClient
       .from("profiles")
-      .select("id")
+      .select("id,organization_id,active,deleted_at")
       .eq("email", adminEmail)
       .maybeSingle();
-    if (existingProfile) throw new Error("Já existe um usuário com este e-mail");
+    if (existingProfile) {
+      const { data: previousOrganization } = existingProfile.organization_id
+        ? await serviceClient
+            .from("organizations")
+            .select("id,status,active,deleted_at")
+            .eq("id", existingProfile.organization_id)
+            .maybeSingle()
+        : { data: null };
+      const accountCanBeReused =
+        !existingProfile.active &&
+        Boolean(
+          existingProfile.deleted_at ||
+          previousOrganization?.deleted_at ||
+          previousOrganization?.status === "cancelled" ||
+          previousOrganization?.active === false,
+        );
+      if (!accountCanBeReused) {
+        throw new Error("Já existe um usuário ativo com este e-mail");
+      }
+    }
 
     const { data: organization, error: organizationError } = await serviceClient
       .from("organizations")
@@ -111,8 +130,30 @@ Deno.serve(async (request) => {
       const redirectTo =
         Deno.env.get("FIRST_ACCESS_REDIRECT_URL") ||
         `${request.headers.get("origin") || ""}/onboarding`;
-      const authResult =
-        input.delivery === "invite"
+      const authResult = existingProfile
+        ? await (async () => {
+            if (input.delivery === "temporary_password") {
+              generatedPassword = temporaryPassword();
+              return serviceClient.auth.admin.updateUserById(existingProfile.id, {
+                password: generatedPassword,
+                email_confirm: true,
+                user_metadata: { full_name: input.adminName.trim(), first_access: true },
+              });
+            }
+            const result = await serviceClient.auth.admin.updateUserById(existingProfile.id, {
+              email_confirm: true,
+              user_metadata: { full_name: input.adminName.trim(), first_access: true },
+            });
+            if (!result.error) {
+              const { error: recoveryError } = await userClient.auth.resetPasswordForEmail(
+                adminEmail,
+                { redirectTo },
+              );
+              if (recoveryError) return { data: result.data, error: recoveryError };
+            }
+            return result;
+          })()
+        : input.delivery === "invite"
           ? await serviceClient.auth.admin.inviteUserByEmail(adminEmail, {
               redirectTo,
               data: { full_name: input.adminName.trim(), first_access: true },
@@ -132,13 +173,13 @@ Deno.serve(async (request) => {
       }
       createdUserId = authResult.data.user.id;
 
-      const { error: profileError } = await serviceClient.from("profiles").insert({
-        id: createdUserId,
+      const profilePayload = {
         organization_id: organization.id,
         full_name: input.adminName.trim(),
         email: adminEmail,
         role: "administrator",
         active: true,
+        deleted_at: null,
         is_platform_admin: false,
         is_organization_admin: true,
         first_access: true,
@@ -146,7 +187,10 @@ Deno.serve(async (request) => {
         invited_at: new Date().toISOString(),
         provisioned_by: user.id,
         provisional_access_expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      });
+      };
+      const { error: profileError } = existingProfile
+        ? await serviceClient.from("profiles").update(profilePayload).eq("id", createdUserId)
+        : await serviceClient.from("profiles").insert({ id: createdUserId, ...profilePayload });
       if (profileError) throw new Error(profileError.message);
 
       await serviceClient.from("audit_logs").insert({
@@ -174,7 +218,9 @@ Deno.serve(async (request) => {
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     } catch (error) {
-      if (createdUserId) await serviceClient.auth.admin.deleteUser(createdUserId);
+      if (createdUserId && !existingProfile) {
+        await serviceClient.auth.admin.deleteUser(createdUserId);
+      }
       await serviceClient.from("organizations").delete().eq("id", organization.id);
       throw error;
     }

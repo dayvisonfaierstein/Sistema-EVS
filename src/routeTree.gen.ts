@@ -30,6 +30,7 @@ import { Route as AppAcessosRouteImport } from './routes/_app/acessos'
 import { Route as AppClientesIndexRouteImport } from './routes/_app/clientes.index'
 import { Route as AppAvaliacoesIndexRouteImport } from './routes/_app/avaliacoes.index'
 import { Route as AppProdutosNovoRouteImport } from './routes/_app/produtos.novo'
+import { Route as AppProdutosImportarHerbalifeRouteImport } from './routes/_app/produtos.importar-herbalife'
 import { Route as AppProdutosIdRouteImport } from './routes/_app/produtos.$id'
 import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo'
 import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
@@ -142,6 +143,12 @@ const AppProdutosNovoRoute = AppProdutosNovoRouteImport.update({
   path: '/novo',
   getParentRoute: () => AppProdutosRoute,
 } as any)
+const AppProdutosImportarHerbalifeRoute =
+  AppProdutosImportarHerbalifeRouteImport.update({
+    id: '/importar-herbalife',
+    path: '/importar-herbalife',
+    getParentRoute: () => AppProdutosRoute,
+  } as any)
 const AppProdutosIdRoute = AppProdutosIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -201,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
   '/produtos/$id': typeof AppProdutosIdRoute
+  '/produtos/importar-herbalife': typeof AppProdutosImportarHerbalifeRoute
   '/produtos/novo': typeof AppProdutosNovoRoute
   '/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/clientes/': typeof AppClientesIndexRoute
@@ -229,6 +237,7 @@ export interface FileRoutesByTo {
   '/clientes/$id': typeof AppClientesIdRoute
   '/clientes/novo': typeof AppClientesNovoRoute
   '/produtos/$id': typeof AppProdutosIdRoute
+  '/produtos/importar-herbalife': typeof AppProdutosImportarHerbalifeRoute
   '/produtos/novo': typeof AppProdutosNovoRoute
   '/avaliacoes': typeof AppAvaliacoesIndexRoute
   '/clientes': typeof AppClientesIndexRoute
@@ -260,6 +269,7 @@ export interface FileRoutesById {
   '/_app/clientes/$id': typeof AppClientesIdRoute
   '/_app/clientes/novo': typeof AppClientesNovoRoute
   '/_app/produtos/$id': typeof AppProdutosIdRoute
+  '/_app/produtos/importar-herbalife': typeof AppProdutosImportarHerbalifeRoute
   '/_app/produtos/novo': typeof AppProdutosNovoRoute
   '/_app/avaliacoes/': typeof AppAvaliacoesIndexRoute
   '/_app/clientes/': typeof AppClientesIndexRoute
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/clientes/$id'
     | '/clientes/novo'
     | '/produtos/$id'
+    | '/produtos/importar-herbalife'
     | '/produtos/novo'
     | '/avaliacoes/'
     | '/clientes/'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/clientes/$id'
     | '/clientes/novo'
     | '/produtos/$id'
+    | '/produtos/importar-herbalife'
     | '/produtos/novo'
     | '/avaliacoes'
     | '/clientes'
@@ -349,6 +361,7 @@ export interface FileRouteTypes {
     | '/_app/clientes/$id'
     | '/_app/clientes/novo'
     | '/_app/produtos/$id'
+    | '/_app/produtos/importar-herbalife'
     | '/_app/produtos/novo'
     | '/_app/avaliacoes/'
     | '/_app/clientes/'
@@ -513,6 +526,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProdutosNovoRouteImport
       parentRoute: typeof AppProdutosRoute
     }
+    '/_app/produtos/importar-herbalife': {
+      id: '/_app/produtos/importar-herbalife'
+      path: '/importar-herbalife'
+      fullPath: '/produtos/importar-herbalife'
+      preLoaderRoute: typeof AppProdutosImportarHerbalifeRouteImport
+      parentRoute: typeof AppProdutosRoute
+    }
     '/_app/produtos/$id': {
       id: '/_app/produtos/$id'
       path: '/$id'
@@ -583,12 +603,14 @@ const AppAvaliacoesRouteWithChildren = AppAvaliacoesRoute._addFileChildren(
 
 interface AppProdutosRouteChildren {
   AppProdutosIdRoute: typeof AppProdutosIdRoute
+  AppProdutosImportarHerbalifeRoute: typeof AppProdutosImportarHerbalifeRoute
   AppProdutosNovoRoute: typeof AppProdutosNovoRoute
   AppProdutosEditarIdRoute: typeof AppProdutosEditarIdRoute
 }
 
 const AppProdutosRouteChildren: AppProdutosRouteChildren = {
   AppProdutosIdRoute: AppProdutosIdRoute,
+  AppProdutosImportarHerbalifeRoute: AppProdutosImportarHerbalifeRoute,
   AppProdutosNovoRoute: AppProdutosNovoRoute,
   AppProdutosEditarIdRoute: AppProdutosEditarIdRoute,
 }

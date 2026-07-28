@@ -8,6 +8,28 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.10.0] - 2026-07-27
+
+### Adicionado
+
+- Importação assistida da tabela Herbalife para Pernambuco com 67 produtos;
+- Prévia comparativa por SKU, separando produtos novos, existentes e conflitos de nome;
+- Seleção individual dos registros que devem ser criados ou atualizados;
+- Escolha da faixa de preço utilizada como custo de referência;
+- Histórico das faixas de preço bruto, 25%, 35%, 42% e 50%;
+- Função transacional no Supabase para impedir importações parciais;
+- Registro da fonte e da data de referência em cada produto importado.
+
+### Segurança
+
+- Produtos existentes não são sobrescritos automaticamente;
+- Importação restrita aos perfis autorizados do módulo comercial;
+- Dados de embalagem e unidades não disponíveis na fonte permanecem pendentes de conferência.
+
+### Alterado
+
+- Número da versão do sistema atualizado para `v0.10.0`.
+
 ## [0.9.1] - 2026-07-27
 
 ### Removido

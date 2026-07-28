@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Edit, Eye, Package, Plus, Search } from "lucide-react";
+import { Download, Edit, Eye, Package, Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageChrome";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,12 +78,20 @@ function ProductsPage() {
             : `${products.data?.length ?? 0} produto(s) encontrado(s)`
         }
         actions={
-          <Button asChild>
-            <Link to="/produtos/novo">
-              <Plus />
-              Novo produto
-            </Link>
-          </Button>
+          <>
+            <Button asChild variant="outline">
+              <Link to="/produtos/importar-herbalife">
+                <Download />
+                Importar tabela PE
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link to="/produtos/novo">
+                <Plus />
+                Novo produto
+              </Link>
+            </Button>
+          </>
         }
       />
       <Card>

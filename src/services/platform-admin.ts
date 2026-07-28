@@ -230,12 +230,22 @@ export type PlanInput = Pick<
 >;
 
 export async function saveAdminPlan(input: PlanInput, id?: string) {
-  const payload = { ...input, code: input.code.trim().toLowerCase() };
+  const payload = {
+    ...input,
+    code: input.code.trim().toLowerCase(),
+    name: input.name.trim(),
+    description: input.description?.trim() || null,
+    price: Number(input.price),
+    trial_days: Number(input.trial_days),
+    grace_days: Number(input.grace_days),
+  };
   const query = id
-    ? getSupabase().from("plans").update(payload).eq("id", id)
-    : getSupabase().from("plans").insert(payload);
-  const { error } = await query;
+    ? getSupabase().from("plans").update(payload).eq("id", id).select().single()
+    : getSupabase().from("plans").insert(payload).select().single();
+  const { data, error } = await query;
   throwIfError(error);
+  if (!data) throw new Error("O Supabase não confirmou o salvamento do plano.");
+  return data as Plan;
 }
 
 export type AdminSubscription = Subscription & {

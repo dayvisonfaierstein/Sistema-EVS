@@ -53,25 +53,39 @@ function PlansPage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string>();
   const [form, setForm] = useState<PlanInput>(emptyPlan);
+  const [formError, setFormError] = useState<string | null>(null);
   const query = useQuery({ queryKey: ["admin-plans"], queryFn: listAdminPlans });
   const mutation = useMutation({
     mutationFn: () => saveAdminPlan(form, editingId),
     onSuccess: async () => {
+      setFormError(null);
       toast.success(editingId ? "Plano atualizado." : "Plano criado.");
       setOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin-plans"] });
       await queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error) => {
+      const message =
+        error.message.includes("plans_code_key") ||
+        error.message.toLowerCase().includes("duplicate key")
+          ? "Já existe um plano cadastrado com este código."
+          : error.message.toLowerCase().includes("row-level security")
+            ? "O Supabase não reconheceu este usuário como Super Admin para cadastrar planos."
+            : error.message;
+      setFormError(message);
+      toast.error(message);
+    },
   });
 
   function startNew() {
     setEditingId(undefined);
     setForm(emptyPlan);
+    setFormError(null);
     setOpen(true);
   }
   function startEdit(plan: Plan) {
     setEditingId(plan.id);
+    setFormError(null);
     setForm({
       code: plan.code,
       name: plan.name,
@@ -83,6 +97,27 @@ function PlansPage() {
       active: plan.active,
     });
     setOpen(true);
+  }
+
+  function savePlan() {
+    setFormError(null);
+    if (!/^[a-z0-9][a-z0-9_-]*$/i.test(form.code.trim())) {
+      setFormError("Use no código apenas letras, números, hífen ou sublinhado.");
+      return;
+    }
+    if (form.name.trim().length < 2) {
+      setFormError("Informe o nome do plano.");
+      return;
+    }
+    if (!Number.isFinite(Number(form.price)) || Number(form.price) < 0) {
+      setFormError("Informe um valor válido para o plano.");
+      return;
+    }
+    if (form.trial_days < 0 || form.grace_days < 0) {
+      setFormError("Os dias de teste e carência não podem ser negativos.");
+      return;
+    }
+    mutation.mutate();
   }
 
   return (
@@ -244,12 +279,20 @@ function PlansPage() {
             </label>
           </div>
           <DialogFooter>
+            {formError && (
+              <div
+                role="alert"
+                className="mb-2 w-full rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-left text-sm font-medium text-destructive sm:mb-0 sm:mr-auto"
+              >
+                {formError}
+              </div>
+            )}
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
             <Button
               disabled={!form.code.trim() || !form.name.trim() || mutation.isPending}
-              onClick={() => mutation.mutate()}
+              onClick={savePlan}
             >
               {mutation.isPending ? "Salvando..." : "Salvar plano"}
             </Button>

@@ -1,6 +1,7 @@
 export type UserRole =
   | "super_admin"
   | "administrator"
+  | "manager"
   | "attendant"
   | "evaluator"
   | "finance"
@@ -134,4 +135,184 @@ export type Access = {
   notes: string | null;
   created_at: string;
   clients?: Pick<Client, "full_name" | "photo_url">;
+};
+
+export type ProductCategory = {
+  id: string;
+  organization_id: string;
+  name: string;
+  description: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProductVerificationStatus = "pending" | "verified" | "updated";
+
+export type Product = {
+  id: string;
+  organization_id: string;
+  category_id: string | null;
+  name: string;
+  description: string | null;
+  brand: string | null;
+  subcategory: string | null;
+  sku: string | null;
+  barcode: string | null;
+  unit: string;
+  photo_url: string | null;
+  package_content: number | null;
+  content_unit: string | null;
+  stock_unit: string;
+  consumption_unit: string;
+  volume_points: number | null;
+  pv_last_updated_at: string | null;
+  cost_price: number;
+  average_cost: number;
+  sale_price: number;
+  minimum_stock: number;
+  current_stock: number;
+  track_batches: boolean;
+  active: boolean;
+  notes: string | null;
+  verification_status: ProductVerificationStatus;
+  source_name: string | null;
+  source_url: string | null;
+  source_reference_date: string | null;
+  created_at: string;
+  updated_at: string;
+  product_categories?: Pick<ProductCategory, "id" | "name"> | null;
+};
+
+export type ProductReferencePrice = {
+  id: string;
+  organization_id: string;
+  product_id: string;
+  state_code: string;
+  reference_date: string;
+  gross_price: number | null;
+  earnings_base: number | null;
+  price_25: number | null;
+  price_35: number | null;
+  price_42: number | null;
+  price_50: number | null;
+  source_name: string | null;
+  source_url: string | null;
+  imported_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProductPvHistory = {
+  id: string;
+  organization_id: string;
+  product_id: string;
+  volume_points: number;
+  effective_from: string;
+  changed_by: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+export type ProductBatch = {
+  id: string;
+  organization_id: string;
+  product_id: string;
+  supplier_id: string | null;
+  batch_number: string;
+  manufacture_date: string | null;
+  expiration_date: string | null;
+  package_quantity: number | null;
+  package_unit: string | null;
+  consumption_unit: string | null;
+  initial_quantity: number;
+  current_quantity: number;
+  unit_cost: number;
+  received_at: string;
+  status: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type InventoryMovement = {
+  id: string;
+  organization_id: string;
+  product_id: string;
+  batch_id: string | null;
+  access_id: string | null;
+  movement_type: string;
+  quantity: number;
+  unit: string | null;
+  previous_balance: number;
+  new_balance: number;
+  reason: string | null;
+  notes: string | null;
+  reference_type: string | null;
+  reference_id: string | null;
+  user_id: string | null;
+  created_at: string;
+};
+
+export type Recipe = {
+  id: string;
+  organization_id: string;
+  name: string;
+  category: string | null;
+  description: string | null;
+  photo_url: string | null;
+  sale_price: number;
+  active: boolean;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RecipeItem = {
+  id: string;
+  organization_id: string;
+  recipe_id: string;
+  product_id: string;
+  quantity: number;
+  unit: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AccessConsumption = {
+  id: string;
+  organization_id: string;
+  access_id: string;
+  client_id: string;
+  consumption_type: "recipe" | "product";
+  recipe_id: string | null;
+  direct_product_id: string | null;
+  item_name_snapshot: string;
+  quantity: number;
+  sale_price_snapshot: number;
+  cost_total: number;
+  pv_total: number;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+};
+
+export type ConsumptionItem = {
+  id: string;
+  organization_id: string;
+  access_consumption_id: string;
+  product_id: string | null;
+  batch_id: string | null;
+  inventory_movement_id: string | null;
+  product_name_snapshot: string;
+  sku_snapshot: string | null;
+  quantity: number;
+  unit: string;
+  unit_cost_snapshot: number;
+  cost_total: number;
+  unit_pv_snapshot: number;
+  pv_total: number;
+  created_at: string;
 };

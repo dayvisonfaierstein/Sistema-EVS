@@ -8,6 +8,27 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.7.0] - 2026-07-27
+
+### Adicionado
+
+- Fundação do módulo comercial integrada ao schema existente do Espaço+;
+- Estrutura de embalagem, unidades de estoque e consumo, PV e custo médio nos produtos;
+- Tabelas de preços de referência por estado e faixa de desconto;
+- Histórico não retroativo de Pontos de Volume;
+- Estrutura de receitas e ingredientes;
+- Estrutura de consumos vinculados aos acessos com snapshots de custo e PV;
+- Buckets protegidos para fotos de produtos e receitas;
+- Categorias iniciais de produtos para organizações atuais e futuras;
+- Perfil de acesso “Gestor” para o módulo comercial;
+- Tipos TypeScript para produtos, lotes, movimentações, receitas e consumos.
+
+### Alterado
+
+- Precisão dos saldos de estoque, custos e quantidades preparada para consumo em gramas, mililitros ou unidades;
+- Políticas comerciais ajustadas para separar consulta e manutenção de dados sensíveis;
+- Estrutura de lotes preparada para consumo FEFO.
+
 ## [0.6.8] - 2026-07-27
 
 ### Alterado

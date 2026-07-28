@@ -48,6 +48,7 @@ import { Route as AppClientesNovoRouteImport } from './routes/_app/clientes.novo
 import { Route as AppClientesIdRouteImport } from './routes/_app/clientes.$id'
 import { Route as AppAvaliacoesNovaRouteImport } from './routes/_app/avaliacoes.nova'
 import { Route as AppAvaliacoesIdRouteImport } from './routes/_app/avaliacoes.$id'
+import { Route as AppUsuariosIdPermissoesRouteImport } from './routes/_app/usuarios.$id.permissoes'
 import { Route as AppReceitasEditarIdRouteImport } from './routes/_app/receitas.editar.$id'
 import { Route as AppProdutosEditarIdRouteImport } from './routes/_app/produtos.editar.$id'
 import { Route as AppClientesEditarIdRouteImport } from './routes/_app/clientes.editar.$id'
@@ -247,6 +248,11 @@ const AppAvaliacoesIdRoute = AppAvaliacoesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppAvaliacoesRoute,
 } as any)
+const AppUsuariosIdPermissoesRoute = AppUsuariosIdPermissoesRouteImport.update({
+  id: '/$id/permissoes',
+  path: '/$id/permissoes',
+  getParentRoute: () => AppUsuariosRoute,
+} as any)
 const AppReceitasEditarIdRoute = AppReceitasEditarIdRouteImport.update({
   id: '/editar/$id',
   path: '/editar/$id',
@@ -283,7 +289,7 @@ export interface FileRoutesByFullPath {
   '/produtos': typeof AppProdutosRouteWithChildren
   '/receitas': typeof AppReceitasRouteWithChildren
   '/relatorios': typeof AppRelatoriosRoute
-  '/usuarios': typeof AppUsuariosRoute
+  '/usuarios': typeof AppUsuariosRouteWithChildren
   '/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
@@ -305,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/produtos/editar/$id': typeof AppProdutosEditarIdRoute
   '/receitas/editar/$id': typeof AppReceitasEditarIdRoute
+  '/usuarios/$id/permissoes': typeof AppUsuariosIdPermissoesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -322,7 +329,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof AppEventosRoute
   '/financeiro': typeof AppFinanceiroRoute
   '/relatorios': typeof AppRelatoriosRoute
-  '/usuarios': typeof AppUsuariosRoute
+  '/usuarios': typeof AppUsuariosRouteWithChildren
   '/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
@@ -344,6 +351,7 @@ export interface FileRoutesByTo {
   '/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/produtos/editar/$id': typeof AppProdutosEditarIdRoute
   '/receitas/editar/$id': typeof AppReceitasEditarIdRoute
+  '/usuarios/$id/permissoes': typeof AppUsuariosIdPermissoesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -367,7 +375,7 @@ export interface FileRoutesById {
   '/_app/produtos': typeof AppProdutosRouteWithChildren
   '/_app/receitas': typeof AppReceitasRouteWithChildren
   '/_app/relatorios': typeof AppRelatoriosRoute
-  '/_app/usuarios': typeof AppUsuariosRoute
+  '/_app/usuarios': typeof AppUsuariosRouteWithChildren
   '/_app/vendas': typeof AppVendasRoute
   '/admin/assinaturas': typeof AdminAssinaturasRoute
   '/admin/auditoria': typeof AdminAuditoriaRoute
@@ -389,6 +397,7 @@ export interface FileRoutesById {
   '/_app/clientes/editar/$id': typeof AppClientesEditarIdRoute
   '/_app/produtos/editar/$id': typeof AppProdutosEditarIdRoute
   '/_app/receitas/editar/$id': typeof AppReceitasEditarIdRoute
+  '/_app/usuarios/$id/permissoes': typeof AppUsuariosIdPermissoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/clientes/editar/$id'
     | '/produtos/editar/$id'
     | '/receitas/editar/$id'
+    | '/usuarios/$id/permissoes'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -473,6 +483,7 @@ export interface FileRouteTypes {
     | '/clientes/editar/$id'
     | '/produtos/editar/$id'
     | '/receitas/editar/$id'
+    | '/usuarios/$id/permissoes'
   id:
     | '__root__'
     | '/'
@@ -517,6 +528,7 @@ export interface FileRouteTypes {
     | '/_app/clientes/editar/$id'
     | '/_app/produtos/editar/$id'
     | '/_app/receitas/editar/$id'
+    | '/_app/usuarios/$id/permissoes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -805,6 +817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvaliacoesIdRouteImport
       parentRoute: typeof AppAvaliacoesRoute
     }
+    '/_app/usuarios/$id/permissoes': {
+      id: '/_app/usuarios/$id/permissoes'
+      path: '/$id/permissoes'
+      fullPath: '/usuarios/$id/permissoes'
+      preLoaderRoute: typeof AppUsuariosIdPermissoesRouteImport
+      parentRoute: typeof AppUsuariosRoute
+    }
     '/_app/receitas/editar/$id': {
       id: '/_app/receitas/editar/$id'
       path: '/editar/$id'
@@ -881,6 +900,18 @@ const AppReceitasRouteWithChildren = AppReceitasRoute._addFileChildren(
   AppReceitasRouteChildren,
 )
 
+interface AppUsuariosRouteChildren {
+  AppUsuariosIdPermissoesRoute: typeof AppUsuariosIdPermissoesRoute
+}
+
+const AppUsuariosRouteChildren: AppUsuariosRouteChildren = {
+  AppUsuariosIdPermissoesRoute: AppUsuariosIdPermissoesRoute,
+}
+
+const AppUsuariosRouteWithChildren = AppUsuariosRoute._addFileChildren(
+  AppUsuariosRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAcessosRoute: typeof AppAcessosRoute
   AppAgendaRoute: typeof AppAgendaRoute
@@ -894,7 +925,7 @@ interface AppRouteChildren {
   AppProdutosRoute: typeof AppProdutosRouteWithChildren
   AppReceitasRoute: typeof AppReceitasRouteWithChildren
   AppRelatoriosRoute: typeof AppRelatoriosRoute
-  AppUsuariosRoute: typeof AppUsuariosRoute
+  AppUsuariosRoute: typeof AppUsuariosRouteWithChildren
   AppVendasRoute: typeof AppVendasRoute
   AppClientesIdRoute: typeof AppClientesIdRoute
   AppClientesNovoRoute: typeof AppClientesNovoRoute
@@ -915,7 +946,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProdutosRoute: AppProdutosRouteWithChildren,
   AppReceitasRoute: AppReceitasRouteWithChildren,
   AppRelatoriosRoute: AppRelatoriosRoute,
-  AppUsuariosRoute: AppUsuariosRoute,
+  AppUsuariosRoute: AppUsuariosRouteWithChildren,
   AppVendasRoute: AppVendasRoute,
   AppClientesIdRoute: AppClientesIdRoute,
   AppClientesNovoRoute: AppClientesNovoRoute,

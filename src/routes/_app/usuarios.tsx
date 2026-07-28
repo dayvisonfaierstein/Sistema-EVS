@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Check,
@@ -7,6 +7,7 @@ import {
   MailPlus,
   MoreHorizontal,
   Search,
+  Settings2,
   ShieldCheck,
   UserCheck,
   UserCog,
@@ -409,6 +410,12 @@ function TeamUsersPage() {
                             {canPromote && !administrator && user.active && (
                               <>
                                 <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                  <Link to="/usuarios/$id/permissoes" params={{ id: user.id }}>
+                                    <Settings2 />
+                                    Gerenciar permissões
+                                  </Link>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
                                     if (

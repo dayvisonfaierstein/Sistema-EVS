@@ -1,5 +1,5 @@
 import { getSupabase } from "@/integrations/supabase/client";
-import type { AccessTemplate, AccessTemplateKey, Profile } from "@/types/database";
+import type { AccessTemplate, AccessTemplateKey, Permission, Profile } from "@/types/database";
 
 export type TeamUserInput = {
   fullName: string;
@@ -45,6 +45,17 @@ export async function listTeamUsers() {
   return (data ?? []) as Profile[];
 }
 
+export async function getTeamUser(userId: string) {
+  const { data, error } = await getSupabase()
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .is("deleted_at", null)
+    .single();
+  if (error) throw error;
+  return data as Profile;
+}
+
 export async function listAccessTemplates() {
   const { data, error } = await getSupabase()
     .from("access_templates")
@@ -53,6 +64,54 @@ export async function listAccessTemplates() {
     .order("name");
   if (error) throw error;
   return (data ?? []) as AccessTemplate[];
+}
+
+export async function listPermissionCatalog() {
+  const { data, error } = await getSupabase()
+    .from("permissions")
+    .select("*")
+    .eq("active", true)
+    .order("module")
+    .order("name");
+  if (error) throw error;
+  return (data ?? []) as Permission[];
+}
+
+export async function getUserPermissionKeys(userId: string) {
+  const { data, error } = await getSupabase()
+    .from("user_permissions")
+    .select("granted,permission:permissions(key)")
+    .eq("user_id", userId)
+    .eq("granted", true);
+  if (error) throw error;
+  return (data ?? [])
+    .map((item) => {
+      const permission = item.permission as unknown as { key: string } | null;
+      return permission?.key;
+    })
+    .filter((key): key is string => Boolean(key))
+    .sort();
+}
+
+export async function getTemplatePermissionKeys(templateKey: AccessTemplateKey) {
+  const { data, error } = await getSupabase().rpc("get_template_permissions", {
+    requested_template_key: templateKey,
+  });
+  if (error) throw error;
+  return (data ?? []).map((item: { permission_key: string }) => item.permission_key).sort();
+}
+
+export async function saveUserPermissions(
+  userId: string,
+  permissionKeys: string[],
+  templateKey: AccessTemplateKey,
+) {
+  const { error } = await getSupabase().rpc("set_user_permissions", {
+    target_user_id: userId,
+    permission_keys: permissionKeys,
+    selected_template_key: templateKey,
+  });
+  if (error) throw error;
 }
 
 export function createTeamUser(input: TeamUserInput) {

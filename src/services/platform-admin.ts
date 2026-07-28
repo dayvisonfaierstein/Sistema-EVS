@@ -166,6 +166,47 @@ export async function listAdminOrganizations() {
   return (data ?? []) as Organization[];
 }
 
+export type ProvisionOrganizationInput = {
+  legalName: string;
+  tradeName: string;
+  document?: string;
+  phone?: string;
+  email?: string;
+  city?: string;
+  state?: string;
+  adminName: string;
+  adminEmail: string;
+  delivery: "invite" | "temporary_password";
+};
+
+export type ProvisionOrganizationResult = {
+  organizationId: string;
+  organizationName: string;
+  adminEmail: string;
+  delivery: ProvisionOrganizationInput["delivery"];
+  temporaryPassword?: string;
+  expiresInDays: number;
+};
+
+export async function provisionAdminOrganization(input: ProvisionOrganizationInput) {
+  const { data, error } = await getSupabase().functions.invoke("provision-organization", {
+    body: input,
+  });
+  if (error) {
+    let message = error.message;
+    try {
+      const response = error.context as Response | undefined;
+      const payload = response ? await response.clone().json() : null;
+      if (payload?.error) message = payload.error;
+    } catch {
+      // Mantém a mensagem original quando a resposta não contém JSON.
+    }
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return data as ProvisionOrganizationResult;
+}
+
 export async function listAdminPlans() {
   const { data, error } = await getSupabase()
     .from("plans")

@@ -16,6 +16,8 @@ function AdminLayoutRoute() {
     if (!configured || loading) return;
     if (!session || !profile?.active) {
       navigate({ to: "/login", replace: true });
+    } else if (profile.first_access) {
+      navigate({ to: "/onboarding", replace: true });
     } else if (!isSuperAdmin) {
       navigate({ to: "/sem-permissao", replace: true });
     }
@@ -27,7 +29,7 @@ function AdminLayoutRoute() {
         Carregando administração segura...
       </div>
     );
-  if (!session || !profile?.active || !isSuperAdmin) return null;
+  if (!session || !profile?.active || profile.first_access || !isSuperAdmin) return null;
 
   return (
     <AdminShell>

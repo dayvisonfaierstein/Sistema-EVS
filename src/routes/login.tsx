@@ -33,8 +33,9 @@ function LoginRoute() {
   useEffect(() => {
     if (session && profile?.active) {
       navigate({
-        to:
-          profile.is_platform_admin || profile.role === "super_admin"
+        to: profile.first_access
+          ? "/onboarding"
+          : profile.is_platform_admin || profile.role === "super_admin"
             ? "/admin"
             : profile.role === "client"
               ? "/portal"

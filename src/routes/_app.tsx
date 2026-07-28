@@ -21,6 +21,10 @@ function AppLayout() {
       navigate({ to: "/login", replace: true });
       return;
     }
+    if (profile.first_access) {
+      navigate({ to: "/onboarding", replace: true });
+      return;
+    }
     const requirement = getRouteRequirement(pathname);
     if (requirement && !requirement.anyOf.some(hasPermission)) {
       navigate({ to: "/sem-permissao", replace: true });
@@ -32,7 +36,7 @@ function AppLayout() {
         Carregando ambiente seguro...
       </div>
     );
-  if (configured && (!session || !profile?.active)) return null;
+  if (configured && (!session || !profile?.active || profile.first_access)) return null;
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">

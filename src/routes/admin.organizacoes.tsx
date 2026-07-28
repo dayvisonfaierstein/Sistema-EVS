@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Building2, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/layout/PageChrome";
+import { ProvisionOrganizationDialog } from "@/components/admin/ProvisionOrganizationDialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,13 @@ function OrganizationsPage() {
       <PageHeader
         title="Organizações"
         description="Todos os espaços cadastrados na plataforma e suas situações atuais."
+        actions={
+          <ProvisionOrganizationDialog
+            onCreated={async () => {
+              await query.refetch();
+            }}
+          />
+        }
       />
       <Card>
         <CardContent className="p-0">

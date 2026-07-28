@@ -22,6 +22,9 @@ export type Profile = {
   first_access: boolean;
   job_title: string | null;
   access_template: string | null;
+  invited_at: string | null;
+  provisioned_by: string | null;
+  provisional_access_expires_at: string | null;
   last_access_at: string | null;
   deleted_at: string | null;
   created_at: string;

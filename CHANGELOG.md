@@ -8,6 +8,28 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.21.0] - 2026-07-28
+
+### Adicionado
+
+- Fase 6 da arquitetura SaaS com cadastro controlado de novos Espaços;
+- Provisionamento seguro de organização e administrador por Supabase Edge Function;
+- Opção de convite por e-mail ou geração de senha provisória;
+- Exibição única dos dados provisórios com botão para cópia;
+- Prazo de sete dias para conclusão do primeiro acesso;
+- Primeiro acesso obrigatório com troca de senha e confirmação cadastral;
+- Auditoria do provisionamento e da conclusão do primeiro acesso;
+- Identificação do Super Admin responsável pelo cadastro;
+- Número da versão do sistema atualizado para v0.21.0.
+
+### Segurança
+
+- Senhas são administradas exclusivamente pelo Supabase Auth;
+- Nenhuma senha provisória é persistida em tabelas, logs ou metadados;
+- Edge Function valida a sessão e o perfil de Super Admin antes do provisionamento;
+- Falhas intermediárias removem a conta e a organização criadas parcialmente;
+- Autocadastro público de organizações permanece desativado.
+
 ## [0.20.0] - 2026-07-28
 
 ### Adicionado

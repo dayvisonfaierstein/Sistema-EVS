@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, ArrowLeft, CheckCircle2, Download, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
@@ -47,10 +47,14 @@ const costLabels: Record<ImportCostBasis, string> = {
 };
 
 function HerbalifePeImportPage() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [rows, setRows] = useState<HerbalifeImportPreviewRow[]>([]);
   const [costBasis, setCostBasis] = useState<ImportCostBasis>("price_50");
+  const [lastResult, setLastResult] = useState<{
+    created: number;
+    updated: number;
+    skipped: number;
+  } | null>(null);
   const preview = useQuery({
     queryKey: ["herbalife-pe-import-preview"],
     queryFn: () => analyzeHerbalifePeImport(HERBALIFE_PE_PRICE_ROWS),
@@ -73,8 +77,9 @@ function HerbalifePeImportPage() {
     mutationFn: () => importHerbalifePeProducts(rows, costBasis),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["products"] });
+      setLastResult(result);
+      setRows((current) => current.map((row) => ({ ...row, action: "skip" })));
       toast.success(`${result.created} produto(s) criado(s) e ${result.updated} atualizado(s).`);
-      await navigate({ to: "/produtos" });
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "Não foi possível importar a tabela."),
@@ -233,6 +238,40 @@ function HerbalifePeImportPage() {
           {importer.isPending ? "Importando..." : "Confirmar importação"}
         </Button>
       </div>
+      {lastResult && (
+        <Card className="border-success/30 bg-success/5">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="mt-0.5 size-5 text-success" />
+              <div>
+                <p className="font-medium text-success">Importação concluída com sucesso</p>
+                <p className="text-sm text-muted-foreground">
+                  {lastResult.created} criado(s), {lastResult.updated} atualizado(s) e{" "}
+                  {lastResult.skipped} ignorado(s).
+                </p>
+              </div>
+            </div>
+            <Button asChild variant="outline">
+              <Link to="/produtos">Ver produtos importados</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+      {importer.isError && (
+        <Card className="border-destructive/30 bg-destructive/5">
+          <CardContent className="flex gap-3 p-4">
+            <AlertTriangle className="mt-0.5 size-5 shrink-0 text-destructive" />
+            <div>
+              <p className="font-medium text-destructive">A importação não foi concluída</p>
+              <p className="text-sm text-muted-foreground">
+                {importer.error instanceof Error
+                  ? importer.error.message
+                  : "Ocorreu um erro inesperado. Tente novamente."}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

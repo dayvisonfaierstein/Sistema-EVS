@@ -8,6 +8,14 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.10.1] - 2026-07-27
+
+### Corrigido
+
+- Resultado da importação Herbalife agora permanece visível na própria página;
+- Erros da importação agora são exibidos de forma persistente com a mensagem retornada pelo Supabase;
+- Redirecionamento automático removido para que o usuário consiga confirmar o resultado.
+
 ## [0.10.0] - 2026-07-27
 
 ### Adicionado

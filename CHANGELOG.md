@@ -8,6 +8,23 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.8.0] - 2026-07-27
+
+### Adicionado
+
+- Cadastro completo de produtos com identificação, SKU, código de barras, marca e categoria;
+- Controle das unidades de embalagem, estoque e consumo;
+- Cadastro de PV, custo de referência, preço de venda e estoque mínimo;
+- Gerenciamento de categorias com criação, ativação e desativação;
+- Página de detalhes do produto e fluxo de edição;
+- Filtros do catálogo por nome ou SKU, categoria, marca, situação e nível de estoque.
+
+### Alterado
+
+- Listagem simulada de produtos substituída pelo catálogo real integrado ao Supabase;
+- Situação de estoque calculada com base no saldo atual e no estoque mínimo;
+- Número da versão do sistema atualizado para `v0.8.0`.
+
 ## [0.7.0] - 2026-07-27
 
 ### Adicionado

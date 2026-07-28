@@ -18,6 +18,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   createAdminSubscription,
   createAdminSubscriptionPayment,
   listAdminOrganizations,
@@ -42,6 +49,32 @@ const statusLabels: Record<SubscriptionStatus, string> = {
   grace_period: "Carência",
   blocked: "Bloqueada",
   cancelled: "Cancelada",
+};
+const statusVisual: Record<SubscriptionStatus, { trigger: string; dot: string }> = {
+  pending: {
+    trigger: "border-amber-300 bg-amber-50 text-amber-800",
+    dot: "bg-amber-500",
+  },
+  active: {
+    trigger: "border-emerald-300 bg-emerald-50 text-emerald-800",
+    dot: "bg-emerald-500",
+  },
+  overdue: {
+    trigger: "border-red-300 bg-red-50 text-red-800",
+    dot: "bg-red-500",
+  },
+  grace_period: {
+    trigger: "border-orange-300 bg-orange-50 text-orange-800",
+    dot: "bg-orange-500",
+  },
+  blocked: {
+    trigger: "border-rose-300 bg-rose-50 text-rose-800",
+    dot: "bg-rose-600",
+  },
+  cancelled: {
+    trigger: "border-slate-300 bg-slate-100 text-slate-700",
+    dot: "bg-slate-500",
+  },
 };
 const brl = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -181,24 +214,38 @@ function SubscriptionsPage() {
                         : "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <select
-                        aria-label="Situação da assinatura"
-                        className="h-8 rounded-md border bg-background px-2 text-xs font-medium"
+                      <Select
                         value={subscription.status}
                         disabled={subscription.status === "cancelled" || statusMutation.isPending}
-                        onChange={(event) =>
+                        onValueChange={(value) =>
                           statusMutation.mutate({
                             id: subscription.id,
-                            status: event.target.value as SubscriptionStatus,
+                            status: value as SubscriptionStatus,
                           })
                         }
                       >
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <option key={value} value={value}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectTrigger
+                          aria-label="Situação da assinatura"
+                          className={`h-8 w-36 text-xs font-semibold shadow-none ${statusVisual[subscription.status].trigger}`}
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(statusLabels).map(([value, label]) => {
+                            const status = value as SubscriptionStatus;
+                            return (
+                              <SelectItem key={status} value={status}>
+                                <span className="flex items-center gap-2">
+                                  <span
+                                    className={`size-2 rounded-full ${statusVisual[status].dot}`}
+                                  />
+                                  <span>{label}</span>
+                                </span>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button

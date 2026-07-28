@@ -89,14 +89,16 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
           <img
-            src="/images/logo-espaco-mais-icon.png"
+            src="/images/logo-espaco-mais-dashboard.png"
             alt="Espaço+"
-            className="size-9 shrink-0 rounded-xl object-contain"
+            className="size-10 shrink-0 object-contain"
           />
           {!collapsed && (
             <div className="min-w-0">
               <div className="truncate text-sm font-bold leading-tight">Espaço+</div>
-              <div className="truncate text-[11px] text-muted-foreground">Sistema de Gestão</div>
+              <div className="text-[9px] leading-tight text-muted-foreground">
+                Gestão Inteligente para transformar resultados
+              </div>
             </div>
           )}
         </div>

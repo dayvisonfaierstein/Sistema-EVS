@@ -8,6 +8,13 @@ O projeto utiliza versionamento semântico no formato `MAJOR.MINOR.PATCH`:
 - `MINOR`: novas funcionalidades compatíveis;
 - `PATCH`: correções e pequenos ajustes compatíveis.
 
+## [0.6.4] - 2026-07-27
+
+### Alterado
+
+- Logo do cabeçalho da barra lateral substituída pela nova versão destinada ao dashboard;
+- Assinatura institucional atualizada para “Gestão Inteligente para transformar resultados”.
+
 ## [0.6.3] - 2026-07-27
 
 ### Alterado

@@ -45,7 +45,8 @@ export function PlatformAnnouncementsProvider({ children }: { children: ReactNod
     queryKey: ["received-platform-announcements", profile?.id],
     queryFn: listReceivedAnnouncements,
     enabled: Boolean(configured && session && profile?.organization_id),
-    refetchInterval: 60_000,
+    refetchInterval: 15_000,
+    refetchOnWindowFocus: true,
   });
   const announcements = query.data ?? [];
   const unreadCount = announcements.filter((item) => !item.receipt?.read_at).length;

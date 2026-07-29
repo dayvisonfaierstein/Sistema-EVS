@@ -194,31 +194,13 @@ export async function listReceivedAnnouncements(): Promise<ReceivedAnnouncement[
   const supabase = getSupabase();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return [];
-  const [{ data: announcements, error }, { data: receipts, error: receiptError }] =
-    await Promise.all([
-      supabase
-        .from("platform_announcements")
-        .select("*")
-        .in("status", ["scheduled", "published"])
-        .order("priority", { ascending: false })
-        .order("published_at", { ascending: false }),
-      supabase
-        .from("platform_announcement_receipts")
-        .select(
-          "announcement_id,first_seen_at,last_displayed_at,read_at,acknowledged_at,dismissed_at,display_count",
-        )
-        .eq("profile_id", auth.user.id),
-    ]);
+  const { data, error } = await supabase.rpc("get_my_platform_announcements");
   fail(error);
-  fail(receiptError);
-  const receiptMap = new Map(
-    ((receipts ?? []) as AnnouncementReceipt[]).map((receipt) => [
-      receipt.announcement_id,
-      receipt,
-    ]),
-  );
+  const announcements = (Array.isArray(data) ? data : []) as Array<
+    PlatformAnnouncement & { receipt: AnnouncementReceipt | null }
+  >;
   return Promise.all(
-    ((announcements ?? []) as PlatformAnnouncement[]).map(async (announcement) => {
+    announcements.map(async (announcement) => {
       let imageUrl: string | null = null;
       if (announcement.image_path) {
         const { data } = await supabase.storage
@@ -228,7 +210,7 @@ export async function listReceivedAnnouncements(): Promise<ReceivedAnnouncement[
       }
       return {
         ...announcement,
-        receipt: receiptMap.get(announcement.id) ?? null,
+        receipt: announcement.receipt ?? null,
         image_url: imageUrl,
       };
     }),
